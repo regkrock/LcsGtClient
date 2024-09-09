@@ -8,6 +8,8 @@ Class {
 BaselineOfLcsGtClient >> baseline: spec [
 	<baseline>
 		^ spec for: #common do: [
-			spec package: 'LcsGtClient'
+			spec package: 'LcsGtClient'.
+			spec package: 'Lcs-Base-LepiterUI'  with: [ spec requires: #('LcsGtClient' ) ].
 		]
+
 ]
