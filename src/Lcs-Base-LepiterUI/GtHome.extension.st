@@ -7,3 +7,11 @@ GtHome >> lcsBaseGetStartedSection [
 	<noTest>	
 	^ LcsHomeMultiCardSection new
 ]
+
+{ #category : #'*Lcs-Base-LepiterUI' }
+GtHome >> seasGetStartedSection [
+	<gtHomeSection>
+	<gtExample>
+	<noTest>	
+	^ LcsSeasMultiCardSection new
+]
