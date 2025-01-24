@@ -1,7 +1,7 @@
 Class {
 	#name : #LcsHomeMultiCardSection,
 	#superclass : #GtHomeMultiCardSection,
-	#category : #'Lcs-Base-LepiterUI'
+	#category : #'Lcs-Base-LepiterUI-Lepiter'
 }
 
 { #category : #accessing }
