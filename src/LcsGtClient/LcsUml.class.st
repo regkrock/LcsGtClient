@@ -167,7 +167,7 @@ LcsUml >> umlClassFor: aClassOrAProposedClassName in: umlModelClasses [
 
 { #category : #'as yet unclassified' }
 LcsUml >> umlForExistingAndProposedClasses [
-	<example>
+	<gtExample>
 	^ self proposedUmlModelFor: 
 		{	
 			SequenceableCollection.
@@ -183,7 +183,7 @@ LcsUml >> umlForExistingAndProposedClasses [
 
 { #category : #'as yet unclassified' }
 LcsUml >> umlForExistingAndProposedClassesWithAssociations [
-	<example>
+	<gtExample>
 	| classes associations |
 	classes := 
 		{	
