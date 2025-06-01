@@ -57,3 +57,146 @@ LcsUml >> applicationEnvironmentInstanceDiagram [
 	m root children withIndexDo: [ :child :n | child relocate: (positions at: n) ].
 	^ m
 ]
+
+{ #category : #'as yet unclassified' }
+LcsUml >> associationArrowStencilWithLabel: labelText [ 
+	^ [ :class | 
+		| line |
+		line := BlParabollaArcElement new
+			zIndex: 0;
+			curvatureFraction: 0.2;
+			border: (BlBorder paint: self associationColor).
+
+		labelText notNil
+			ifTrue: [ line
+				clipChildren: false;
+				addChild: (BrLabel new
+						text: labelText;
+						zIndex: 0;
+						background: Color white;
+						aptitude: (BrGlamorousLabelAptitude new fontSize: self labelFontSize);
+						margin: (BlInsets top: 10);
+						constraintsDo: [ :c | 
+							c ignored vertical alignCenterAt: 0.3.
+							c ignored horizontal alignCenter.
+							c ignoreByLayout ]) ].
+
+		line := line
+			toHead: (BlArrowheadSimpleArrow new border: (BlBorder paint: self associationColor)).
+
+
+		line ]
+]
+
+{ #category : #'as yet unclassified' }
+LcsUml >> associationColor [
+	^ Color orange alpha: 0.4
+]
+
+{ #category : #'as yet unclassified' }
+LcsUml >> fromObjectFor: aClassOrAProposedClass in: umlModelClasses [
+	aClassOrAProposedClass isClass ifTrue: [ ^ aClassOrAProposedClass superclass ].
+	aClassOrAProposedClass superclass ifNotNil: [ :class | ^ class ].
+	^ (umlModelClasses reject: [:each | each isClass ]) detect: [ :e | 
+		e classname = aClassOrAProposedClass superclassName ] 
+]
+
+{ #category : #'as yet unclassified' }
+LcsUml >> labelFontSize [
+	^ 12
+]
+
+{ #category : #'as yet unclassified' }
+LcsUml >> proposedUmlModelFor: umlModelClasses [
+	"<example>"
+	| m |
+	m := GtMondrian new.
+	m nodes
+		stencil: [ :c | 
+			BrLabel new
+				border: (BlBorder paint: (c isClass ifTrue: [ Color gray ] ifFalse: [ Color blue ]));
+				text: (c isClass
+						ifTrue: [ c name ]
+						ifFalse: [ c classname asRopedText foreground: Color blue ]);
+				aptitude: BrGlamorousLabelAptitude new
+						+ (BrStyleCommonAptitude new
+								hovered: [ :aStyle | aStyle background: (Color blue alpha: 0.5) ]);
+				when: BlClickEvent
+					do: [ :e | 
+						c isClass
+							ifTrue: [ e target phlow spawnTool: (GtClassCoderTool forClass: c).
+								e consumed: true ] ];
+				padding: (BlInsets all: 5) ];
+		with: umlModelClasses.
+	m edges
+		stencil: [ :c | 
+			BlLineElement new
+				border: (BlBorder paint: (c isClass ifTrue: [ Color gray ] ifFalse: [ Color blue ]));
+				fromHead: (BlArrowheadTriangle new
+						scale: 4;
+						border: (BlBorder paint: (c isClass ifTrue: [ Color gray ] ifFalse: [ Color blue ]))) ];
+		connectFrom: [ :each | self fromObjectFor: each in: umlModelClasses ].
+	m layout tree levelDistance: 20.
+	^ m
+]
+
+{ #category : #'as yet unclassified' }
+LcsUml >> proposedUmlModelFor: umlModelClasses associations: associationsWithLabels [ 
+	| m |
+	m := self proposedUmlModelFor: umlModelClasses.
+	
+	associationsWithLabels
+		do: [ :assoc | 
+			assoc value
+				do: [ :labelClassPair | 
+					m edges
+						stencil: (self associationArrowStencilWithLabel: labelClassPair first);
+						connectFrom: [ :each | self umlClassFor: assoc key in: umlModelClasses ] 
+							to: [ :each | self umlClassFor: labelClassPair second in: umlModelClasses] ] ]..
+							
+	^ m
+
+]
+
+{ #category : #'as yet unclassified' }
+LcsUml >> umlClassFor: aClassOrAProposedClassName in: umlModelClasses [
+	aClassOrAProposedClassName isClass ifTrue: [ ^ aClassOrAProposedClassName ].
+	^ (umlModelClasses reject: [:each | each isClass ]) detect: [ :e | 
+		e classname = aClassOrAProposedClassName ] 
+]
+
+{ #category : #'as yet unclassified' }
+LcsUml >> umlForExistingAndProposedClasses [
+	<example>
+	^ self proposedUmlModelFor: 
+		{	
+			SequenceableCollection.
+			ArrayedCollection.
+			LcsProposedClass new
+				classname: 'LxxSample';
+				superclassName: #SequenceableCollection.
+			LcsProposedClass new
+				classname: 'LxxSample2';
+				superclassName: 'LxxSample'
+		}
+]
+
+{ #category : #'as yet unclassified' }
+LcsUml >> umlForExistingAndProposedClassesWithAssociations [
+	<example>
+	| classes associations |
+	classes := 
+		{	
+			SequenceableCollection.
+			ArrayedCollection.
+			LcsProposedClass new
+				classname: 'LxxSample';
+				superclassName: #SequenceableCollection.
+			LcsProposedClass new
+				classname: 'LxxSample2';
+				superclassName: 'LxxSample'
+		}.
+	associations := 
+		{ 'LxxSample2' -> { { 'xxxx'. ArrayedCollection } } }.
+	^ self proposedUmlModelFor: classes associations: associations
+]
