@@ -94,14 +94,6 @@ LcsUml >> associationColor [
 ]
 
 { #category : #'as yet unclassified' }
-LcsUml >> fromObjectFor: aClassOrAProposedClass in: umlModelClasses [
-	aClassOrAProposedClass isClass ifTrue: [ ^ aClassOrAProposedClass superclass ].
-	aClassOrAProposedClass superclass ifNotNil: [ :class | ^ class ].
-	^ (umlModelClasses reject: [:each | each isClass ]) detect: [ :e | 
-		e classname = aClassOrAProposedClass superclassName ] 
-]
-
-{ #category : #'as yet unclassified' }
 LcsUml >> labelFontSize [
 	^ 12
 ]
@@ -114,28 +106,26 @@ LcsUml >> proposedUmlModelFor: umlModelClasses [
 	m nodes
 		stencil: [ :c | 
 			BrLabel new
-				border: (BlBorder paint: (c isClass ifTrue: [ Color gray ] ifFalse: [ Color blue ]));
-				text: (c isClass
-						ifTrue: [ c name ]
-						ifFalse: [ c classname asRopedText foreground: Color blue ]);
+				border: (BlBorder paint: c borderColor);
+				text: c classnameText;
 				aptitude: BrGlamorousLabelAptitude new
 						+ (BrStyleCommonAptitude new
 								hovered: [ :aStyle | aStyle background: (Color blue alpha: 0.5) ]);
 				when: BlClickEvent
 					do: [ :e | 
 						c isClass
-							ifTrue: [ e target phlow spawnTool: (GtClassCoderTool forClass: c).
+							ifTrue: [ e target phlow spawnTool: (GtClassCoderTool forClass: c realClass).
 								e consumed: true ] ];
 				padding: (BlInsets all: 5) ];
 		with: umlModelClasses.
 	m edges
 		stencil: [ :c | 
 			BlLineElement new
-				border: (BlBorder paint: (c isClass ifTrue: [ Color gray ] ifFalse: [ Color blue ]));
+				border: (BlBorder paint: c borderColor);
 				fromHead: (BlArrowheadTriangle new
 						scale: 4;
-						border: (BlBorder paint: (c isClass ifTrue: [ Color gray ] ifFalse: [ Color blue ]))) ];
-		connectFrom: [ :each | self fromObjectFor: each in: umlModelClasses ].
+						border: (BlBorder paint: c borderColor)) ];
+		connectFrom: [ :each | each modelSuperclass ].
 	m layout tree levelDistance: 20.
 	^ m
 ]
@@ -169,34 +159,41 @@ LcsUml >> umlClassFor: aClassOrAProposedClassName in: umlModelClasses [
 LcsUml >> umlForExistingAndProposedClasses [
 	<gtExample>
 	^ self proposedUmlModelFor: 
-		{	
-			SequenceableCollection.
-			ArrayedCollection.
-			LcsProposedClass new
-				classname: 'LxxSample';
-				superclassName: #SequenceableCollection.
-			LcsProposedClass new
-				classname: 'LxxSample2';
-				superclassName: 'LxxSample'
-		}
+		(LcsModelClasses new
+			add: (LcsClassWrapper new
+				modelClass: SequenceableCollection) ;
+			add: (LcsClassWrapper new
+				modelClass: ArrayedCollection);
+			add: (LcsProposedClass new
+				modelClassname: 'LxxSample';
+				modelSuperclassName: #SequenceableCollection);
+			add: (LcsProposedClass new
+				modelClassname: 'LxxSample2';
+				modelSuperclassName: 'LxxSample');
+			connectHierarchy;
+			yourself)
 ]
 
 { #category : #'as yet unclassified' }
 LcsUml >> umlForExistingAndProposedClassesWithAssociations [
 	<gtExample>
-	| classes associations |
-	classes := 
-		{	
-			SequenceableCollection.
-			ArrayedCollection.
-			LcsProposedClass new
-				classname: 'LxxSample';
-				superclassName: #SequenceableCollection.
-			LcsProposedClass new
-				classname: 'LxxSample2';
-				superclassName: 'LxxSample'
-		}.
-	associations := 
-		{ 'LxxSample2' -> { { 'xxxx'. ArrayedCollection } } }.
-	^ self proposedUmlModelFor: classes associations: associations
+	| umlModel associations |
+	umlModel := 
+		(LcsModelClasses new
+			add: (LcsClassWrapper new
+				modelClass: SequenceableCollection) ;
+			add: (LcsClassWrapper new
+				modelClass: ArrayedCollection);
+			add: (LcsProposedClass new
+				modelClassname: 'LxxSample';
+				modelSuperclassName: #SequenceableCollection);
+			add: (LcsProposedClass new
+				modelClassname: 'LxxSample2';
+				modelSuperclassName: 'LxxSample');
+			connectHierarchy;
+			yourself).
+		"umlModel addAssociation: 'xxxx' from: 'LxxSample2' to: 'ArrayedCollection'."
+		"associations := 
+		{ 'LxxSample2' -> { { 'xxxx'. ArrayedCollection } } }."
+	^ self proposedUmlModelFor: umlModel associations: associations
 ]
