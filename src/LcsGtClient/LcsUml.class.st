@@ -148,11 +148,11 @@ LcsUml >> proposedUmlHeirarchyModelFor: umlModelClasses [
 ]
 
 { #category : #'as yet unclassified' }
-LcsUml >> proposedUmlModelFor: umlModelClasses [
+LcsUml >> proposedUmlModelFor: classesModel [
 	| m |
-	m := self proposedUmlHeirarchyModelFor: umlModelClasses.
+	m := self proposedUmlHeirarchyModelFor: classesModel.
 	
-	umlModelClasses do: [ :eachClassModel |
+	classesModel do: [ :eachClassModel |
 		eachClassModel associations do: [ :eachAssociation |
 			m edges
 				stencil: (self associationArrowStencilWithLabel: eachAssociation associationName);
@@ -161,29 +161,6 @@ LcsUml >> proposedUmlModelFor: umlModelClasses [
 							
 	^ m
 
-]
-
-{ #category : #'as yet unclassified' }
-LcsUml >> proposedUmlModelFor: umlModelClasses associations: associationsWithLabels [ 
-	| m |
-	m := self proposedUmlHeirarchyModelFor: umlModelClasses.
-	
-	umlModelClasses do: [ :eachClassModel |
-		eachClassModel associations do: [ :eachAssociation |
-			m edges
-				stencil: (self associationArrowStencilWithLabel: eachAssociation associationName);
-				connectFrom: [ :each | eachClassModel ] 
-						to: [ :each | eachAssociation toClassModel ] ] ].
-							
-	^ m
-
-]
-
-{ #category : #'as yet unclassified' }
-LcsUml >> umlClassFor: aClassOrAProposedClassName in: umlModelClasses [
-	aClassOrAProposedClassName isClass ifTrue: [ ^ aClassOrAProposedClassName ].
-	^ (umlModelClasses reject: [:each | each isClass ]) detect: [ :e | 
-		e classname = aClassOrAProposedClassName ] 
 ]
 
 { #category : #'as yet unclassified' }
