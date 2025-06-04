@@ -94,12 +94,29 @@ LcsUml >> associationColor [
 ]
 
 { #category : #'as yet unclassified' }
+LcsUml >> exampleProposedClassesModel [
+	<gtExample>
+	| model |
+	model := LcsClassesModel new
+		add: (LcsExistingClassModel new modelClass: SequenceableCollection);
+		add: (LcsExistingClassModel new modelClass: ArrayedCollection);
+		add: (LcsProposedClassModel new
+				modelClassname: 'LxxSample';
+				modelSuperclassName: #SequenceableCollection);
+		add: (LcsProposedClassModel new
+				modelClassname: 'LxxSample2';
+				modelSuperclassName: 'LxxSample');
+		yourself.
+	^ model
+]
+
+{ #category : #'as yet unclassified' }
 LcsUml >> labelFontSize [
 	^ 12
 ]
 
 { #category : #'as yet unclassified' }
-LcsUml >> proposedUmlModelFor: umlModelClasses [
+LcsUml >> proposedUmlHeirarchyModelFor: umlModelClasses [
 	"<example>"
 	| m |
 	m := GtMondrian new.
@@ -131,18 +148,32 @@ LcsUml >> proposedUmlModelFor: umlModelClasses [
 ]
 
 { #category : #'as yet unclassified' }
+LcsUml >> proposedUmlModelFor: umlModelClasses [
+	| m |
+	m := self proposedUmlHeirarchyModelFor: umlModelClasses.
+	
+	umlModelClasses do: [ :eachClassModel |
+		eachClassModel associations do: [ :eachAssociation |
+			m edges
+				stencil: (self associationArrowStencilWithLabel: eachAssociation associationName);
+				connectFrom: [ :each | eachClassModel ] 
+						to: [ :each | eachAssociation toClassModel ] ] ].
+							
+	^ m
+
+]
+
+{ #category : #'as yet unclassified' }
 LcsUml >> proposedUmlModelFor: umlModelClasses associations: associationsWithLabels [ 
 	| m |
-	m := self proposedUmlModelFor: umlModelClasses.
+	m := self proposedUmlHeirarchyModelFor: umlModelClasses.
 	
-	associationsWithLabels
-		do: [ :assoc | 
-			assoc value
-				do: [ :labelClassPair | 
-					m edges
-						stencil: (self associationArrowStencilWithLabel: labelClassPair first);
-						connectFrom: [ :each | self umlClassFor: assoc key in: umlModelClasses ] 
-							to: [ :each | self umlClassFor: labelClassPair second in: umlModelClasses] ] ]..
+	umlModelClasses do: [ :eachClassModel |
+		eachClassModel associations do: [ :eachAssociation |
+			m edges
+				stencil: (self associationArrowStencilWithLabel: eachAssociation associationName);
+				connectFrom: [ :each | eachClassModel ] 
+						to: [ :each | eachAssociation toClassModel ] ] ].
 							
 	^ m
 
@@ -158,42 +189,20 @@ LcsUml >> umlClassFor: aClassOrAProposedClassName in: umlModelClasses [
 { #category : #'as yet unclassified' }
 LcsUml >> umlForExistingAndProposedClasses [
 	<gtExample>
-	^ self proposedUmlModelFor: 
-		(LcsModelClasses new
-			add: (LcsClassWrapper new
-				modelClass: SequenceableCollection) ;
-			add: (LcsClassWrapper new
-				modelClass: ArrayedCollection);
-			add: (LcsProposedClass new
-				modelClassname: 'LxxSample';
-				modelSuperclassName: #SequenceableCollection);
-			add: (LcsProposedClass new
-				modelClassname: 'LxxSample2';
-				modelSuperclassName: 'LxxSample');
-			connectHierarchy;
-			yourself)
+	| classesModel |
+	classesModel := self exampleProposedClassesModel.
+	classesModel resolveClassModelNames.
+	^ self proposedUmlModelFor: classesModel
 ]
 
 { #category : #'as yet unclassified' }
 LcsUml >> umlForExistingAndProposedClassesWithAssociations [
 	<gtExample>
-	| umlModel associations |
-	umlModel := 
-		(LcsModelClasses new
-			add: (LcsClassWrapper new
-				modelClass: SequenceableCollection) ;
-			add: (LcsClassWrapper new
-				modelClass: ArrayedCollection);
-			add: (LcsProposedClass new
-				modelClassname: 'LxxSample';
-				modelSuperclassName: #SequenceableCollection);
-			add: (LcsProposedClass new
-				modelClassname: 'LxxSample2';
-				modelSuperclassName: 'LxxSample');
-			connectHierarchy;
-			yourself).
-		"umlModel addAssociation: 'xxxx' from: 'LxxSample2' to: 'ArrayedCollection'."
-		"associations := 
-		{ 'LxxSample2' -> { { 'xxxx'. ArrayedCollection } } }."
-	^ self proposedUmlModelFor: umlModel associations: associations
+	| classesModel classModel |
+	classesModel := self exampleProposedClassesModel.
+	classModel := classesModel classModelForClassname: 'LxxSample2'.
+	self assert: classModel notNil.
+	classModel addAssociation: 'xxxx' toModelNamed: 'ArrayedCollection'.
+	classesModel resolveClassModelNames.
+	^ self proposedUmlModelFor: classesModel
 ]
