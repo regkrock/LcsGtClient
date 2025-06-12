@@ -21,8 +21,19 @@ LcsAccessorSlotCreationForm class >> slotDefintionTypeClass [
 
 { #category : #callback }
 LcsAccessorSlotCreationForm >> commit [
-	( LcsStringSlotDefinitionBuilder new
+	| builder |
+	builder := self slotTypeBuilderClass new.
+	builder
 		slotName: self slotName;
-		target: self targetClass;
-		targetClassName: self targetClass name ) installCode
+		targetClass: self targetClass;
+		targetClassName: self targetClass name;
+		buildJobSteps.
+	builder execute
+]
+
+{ #category : #callback }
+LcsAccessorSlotCreationForm >> slotTypeBuilderClass [
+	^ LcsSlotDefinitionBuilder withAllSubclasses
+		detect: [ :each | each slotDefinitionClass = self slotType ]
+		ifNone: [ LcsSlotDefinitionBuilder ]
 ]

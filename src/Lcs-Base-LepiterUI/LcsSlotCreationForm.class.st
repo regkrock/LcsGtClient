@@ -10,7 +10,8 @@ Class {
 		'slotName',
 		'targetClass',
 		'allowNil',
-		'required'
+		'required',
+		'slotType'
 	],
 	#category : #'Lcs-Base-LepiterUI-Forms - Models'
 }
@@ -55,7 +56,7 @@ LcsSlotCreationForm >> allowNil: anObject [
 	allowNil := anObject
 ]
 
-{ #category : #accessing }
+{ #category : #magritte }
 LcsSlotCreationForm >> allowNilDescription [
 	<magritteDescription>
 	^ MABooleanDescription new
@@ -130,6 +131,7 @@ LcsSlotCreationForm >> initialize [
 	slotClassName := ''.
 	allowNil := false.
 	required := false.
+	slotType := ''
 ]
 
 { #category : #accessing }
@@ -239,7 +241,7 @@ LcsSlotCreationForm >> required: anObject [
 	required := anObject
 ]
 
-{ #category : #accessing }
+{ #category : #magritte }
 LcsSlotCreationForm >> requiredDescription [
 	<magritteDescription>
 	^ MABooleanDescription new
@@ -275,9 +277,9 @@ LcsSlotCreationForm >> slotClassName: anObject [
 	slotClassName := anObject
 ]
 
-{ #category : #accessing }
+{ #category : #magritte }
 LcsSlotCreationForm >> slotClassNameDescription [
-	<magritteDescription>
+	"<magritteDescription>"
 	^ MAStringDescription new
 		label: 'Slot Class';
 		priority: 2;
@@ -328,7 +330,7 @@ LcsSlotCreationForm >> slotName: anObject [
 	slotName := anObject
 ]
 
-{ #category : #accessing }
+{ #category : #magritte }
 LcsSlotCreationForm >> slotNameDescription [
 	<magritteDescription>
 	^ MAStringDescription new
@@ -363,6 +365,29 @@ LcsSlotCreationForm >> slotNameDescription [
 		addCondition: [ :aValue | aValue trim notEmpty  ] labelled: 'Enter slot name';
 		addCondition: [ :aValue | aValue trim size >= 2 ] labelled: 'Slot name must be at least 2 characters';
 		beRequired
+]
+
+{ #category : #accessing }
+LcsSlotCreationForm >> slotType [
+	^ slotType
+]
+
+{ #category : #accessing }
+LcsSlotCreationForm >> slotType: anObject [
+	slotType := anObject
+]
+
+{ #category : #magritte }
+LcsSlotCreationForm >> slotTypeDescription [
+	<magritteDescription>
+	^ MASingleOptionDescription new
+		"reference: MAClassDescription new;"
+		options: LcsSlotDefinition allSubclasses;
+		selectorAccessor: 'slotType';
+		"groupBy: #grouping;"
+		label: 'Slot Type';
+		priority: 2;
+		yourself
 ]
 
 { #category : #accessing }

@@ -46,16 +46,16 @@ LcsAddSlotDefinitionFormElement >> gtCreationInterface: aParentElement [
 		constraintsDo: [ :c | 
 			c horizontal matchParent.
 			c vertical matchParent ].
-	self tabClasses
-		do: [ :each | 
-			contentTabs
-				addTab: (BrTab new
-						aptitude: BrGlamorousTabAptitude new;
-						label: each componentName;
-						stencil: [ (self formCache
-								at: each
-								ifAbsentPut: [ | form |
-									form := (each newOn: self targetClass)
+	self tabClasses do: [ :each | 
+		contentTabs addTab: (
+			BrTab new
+				aptitude: BrGlamorousTabAptitude new;
+				label: each componentName;
+				stencil: [ 
+					(self formCache
+						at: each
+						ifAbsentPut: [ | form |
+							form := (each newOn: self targetClass)
 											onReset: [ aParentElement
 													inUIProcessDo: [ aParentElement fireEvent: BrDropdownHideWish new.
 														self formCache removeKey: each ] ].
@@ -70,13 +70,13 @@ LcsAddSlotDefinitionFormElement >> gtCreationInterface: aParentElement [
 													(aTag isKindOf: RPackageTag)
 														ifTrue: [ aTag isRoot ifFalse: [ form packageAndTagName tagName: aTag name ] ]
 														ifFalse: [ aTag isUncategorized ifFalse: [ form packageAndTagName tagName: aTag name ] ] ] ]."
-									((GtCreationFormWidget forForm: form)
+							((GtCreationFormWidget forForm: form)
 										onAccept: [ :anInstance | 
 											aParentElement
 												inUIProcessDo: [ "form selectInNavigationModel: navigationModel anInstance: anInstance."
 													aParentElement fireEvent: BrDropdownHideWish new ].
 											self formCache removeKey: each ifAbsent: [  ] ]) asElement ])
-								removeFromParent ]) ].
+					removeFromParent ]) ].
 	^ contentTabs
 ]
 
