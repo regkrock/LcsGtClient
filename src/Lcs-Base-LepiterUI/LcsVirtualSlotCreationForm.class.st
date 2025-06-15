@@ -9,14 +9,14 @@ LcsVirtualSlotCreationForm class >> componentName [
 	^ 'Virtual'
 ]
 
+{ #category : #accessing }
+LcsVirtualSlotCreationForm class >> defaultSlotDefintionClass [
+	^ LcsVirtualSlotDefinition
+]
+
 { #category : #'as yet unclassified' }
 LcsVirtualSlotCreationForm class >> priority [
 	^ 30
-]
-
-{ #category : #accessing }
-LcsVirtualSlotCreationForm class >> slotDefintionTypeClass [
-	^ LcsVirtualSlotDefinition
 ]
 
 { #category : #callbacks }

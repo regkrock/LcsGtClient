@@ -9,14 +9,14 @@ LcsFacadeSlotCreationForm class >> componentName [
 	^ 'Facade'
 ]
 
+{ #category : #accessing }
+LcsFacadeSlotCreationForm class >> defaultSlotDefintionClass [
+	^ LcsFacadeSlot
+]
+
 { #category : #'as yet unclassified' }
 LcsFacadeSlotCreationForm class >> priority [
 	^ 20
-]
-
-{ #category : #accessing }
-LcsFacadeSlotCreationForm class >> slotDefintionTypeClass [
-	^ LcsFacadeSlot
 ]
 
 { #category : #callbacks }

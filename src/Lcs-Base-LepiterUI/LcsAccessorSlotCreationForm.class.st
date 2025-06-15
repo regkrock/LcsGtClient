@@ -10,19 +10,19 @@ LcsAccessorSlotCreationForm class >> componentName [
 ]
 
 { #category : #accessing }
-LcsAccessorSlotCreationForm class >> priority [
-	^ 10
+LcsAccessorSlotCreationForm class >> defaultSlotDefintionClass [
+	^ LcsSlotDefinition
 ]
 
 { #category : #accessing }
-LcsAccessorSlotCreationForm class >> slotDefintionTypeClass [
-	^ LcsSlotDefinition
+LcsAccessorSlotCreationForm class >> priority [
+	^ 10
 ]
 
 { #category : #callback }
 LcsAccessorSlotCreationForm >> commit [
 	| builder |
-	builder := self slotTypeBuilderClass new.
+	builder := self slotDefinitionBuilder..
 	builder
 		slotName: self slotName;
 		targetClass: self targetClass;
@@ -32,8 +32,11 @@ LcsAccessorSlotCreationForm >> commit [
 ]
 
 { #category : #callback }
-LcsAccessorSlotCreationForm >> slotTypeBuilderClass [
-	^ LcsSlotDefinitionBuilder withAllSubclasses
-		detect: [ :each | each slotDefinitionClass = self slotType ]
-		ifNone: [ LcsSlotDefinitionBuilder ]
+LcsAccessorSlotCreationForm >> slotDefinitionBuilder [
+	LcsSlotDefinitionBuilder withAllSubclasses do: [ :each |
+		each slotDefinitionClass = self slotDefinitionClass 
+			ifTrue: [ each slotDefinitionClass new ]].
+	^ LcsSlotDefinitionBuilder new
+		slotDefinitionClassName: self slotDefinitionClass name asString;
+		yourself
 ]

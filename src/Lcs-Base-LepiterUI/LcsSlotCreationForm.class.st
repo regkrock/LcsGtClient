@@ -11,7 +11,8 @@ Class {
 		'targetClass',
 		'allowNil',
 		'required',
-		'slotType'
+		'slotDefinitionClass',
+		'slotTypes'
 	],
 	#category : #'Lcs-Base-LepiterUI-Forms - Models'
 }
@@ -19,6 +20,11 @@ Class {
 { #category : #accessing }
 LcsSlotCreationForm class >> componentName [
 	^ self subclassResponsibility
+]
+
+{ #category : #accessing }
+LcsSlotCreationForm class >> defaultSlotDefintionClass [
+	^ LcsSlotDefinition
 ]
 
 { #category : #accessing }
@@ -42,11 +48,6 @@ LcsSlotCreationForm class >> priority [
 ]
 
 { #category : #accessing }
-LcsSlotCreationForm class >> slotDefintionTypeClass [
-	^ self subclassResponsibility
-]
-
-{ #category : #accessing }
 LcsSlotCreationForm >> allowNil [
 	^ allowNil
 ]
@@ -63,13 +64,8 @@ LcsSlotCreationForm >> allowNilDescription [
 		label: 'Allow Nil';
 		priority: 8;
 		accessor: #allowNil;
-		blocCompletion: [ GtStringsCompletionStrategy new
-				completions: GtPharoIndex current classNameTree ];
-		editorAptitude: [ BrGlamorousRegularEditorAptitude new glamorousFormEditorCodeFontAndSize
-				+ (BrGlamorousWithExplicitContextMenuAptitude
-						itemsWithAnchorActions: [ self contextMenuItemsForSuperclass ]) ];
-		labelAptitude: [ BrGlamorousLabelAptitude new glamorousFormLabelStyle ];
-		beRequired
+		editorAptitude: [ BrGlamorousRegularEditorAptitude new glamorousFormEditorCodeFontAndSize];
+		labelAptitude: [ BrGlamorousLabelAptitude new glamorousFormLabelStyle ]
 ]
 
 { #category : #converting }
@@ -84,6 +80,15 @@ LcsSlotCreationForm >> asElement [
 { #category : #accessing }
 LcsSlotCreationForm >> classNamed: aValue [
 	^ Smalltalk classNamed: aValue trim
+]
+
+{ #category : #magritte }
+LcsSlotCreationForm >> classesOrNilsFor: aCollectionOfClassNames [ 
+	"Return collection of Class. If a Class does not exist, `nil` value is used."
+
+	<return: #Collection of: #Class>
+	^ aCollectionOfClassNames
+		collect: [ :eachClasstName | Smalltalk classOrTraitNamed: eachClasstName asString trimBoth ]
 ]
 
 { #category : #callbacks }
@@ -113,10 +118,41 @@ LcsSlotCreationForm >> contextMenuItemsForSuperclass [
 			-> [ :aBrEditor | aBrEditor phlow spawnObject: aBrEditor text asString asClass gtReferences ]}
 ]
 
+{ #category : #'as yet unclassified' }
+LcsSlotCreationForm >> createClassContextMenuContentFor: aClass editor: anElement [
+	| theContextMenu items |
+	theContextMenu := GtFormContextMenuContent new editorElement: anElement.
+	items := OrderedCollection new.
+	items
+		addAll: {GtCoderContextMenuAction new
+					action: [ :form :elem | elem phlow spawnObject: (Smalltalk at: aClass asSymbol) users ];
+					title: 'Browse users' asText}.
+	theContextMenu items: items.
+	^ theContextMenu
+]
+
+{ #category : #accessing }
+LcsSlotCreationForm >> defaultSlotDefintionClass [	
+	^ self class defaultSlotDefintionClass
+]
+
 { #category : #accessing }
 LcsSlotCreationForm >> ghostTextFor: aString [
 	^ BrGhostTextAttribute
 		for: (aString asRopedText glamorousFormEditorCodeFontAndSize foreground: Color lightGray)
+]
+
+{ #category : #'gt view' }
+LcsSlotCreationForm >> gtInspectView: view [
+	"<gtView>"
+	^ view
+		title: 'Test';
+		priority: 49;
+		actionButtonDo: [ :aButtonAction | 
+			aButtonAction
+				icon: BrGlamorousVectorIcons inspect;
+				tooltip: 'Inspect view model';
+				action: [ :aButton | aButton phlow spawnObject: self ] ]
 ]
 
 { #category : #accessing }
@@ -125,13 +161,9 @@ LcsSlotCreationForm >> hasPackageAndTag [
 ]
 
 { #category : #initialization }
-LcsSlotCreationForm >> initialize [
-	packageAndTagName := GtPackageAndTagName new.
-	slotName := ''.
-	slotClassName := ''.
-	allowNil := false.
-	required := false.
-	slotType := ''
+LcsSlotCreationForm >> initialize [ 
+	super initialize.
+	self slotTypes: OrderedCollection new
 ]
 
 { #category : #accessing }
@@ -146,8 +178,8 @@ LcsSlotCreationForm >> isSlotClass: aValue [
 	| class |
 	class := self classNamed: aValue.
 	class isNil ifTrue: [ ^ false ].
-	class = self slotDefintionTypeClass ifTrue: [ ^ true ]. 
-	^ class inheritsFrom: self slotDefintionTypeClass
+	class = self defaultSlotDefintionClass ifTrue: [ ^ true ]. 
+	^ class inheritsFrom: self defaultSlotDefintionClass
 ]
 
 { #category : #magritte }
@@ -248,11 +280,7 @@ LcsSlotCreationForm >> requiredDescription [
 		label: 'Required';
 		priority: 9;
 		accessor: #required;
-		blocCompletion: [ GtStringsCompletionStrategy new
-				completions: GtPharoIndex current classNameTree ];
-		editorAptitude: [ BrGlamorousRegularEditorAptitude new glamorousFormEditorCodeFontAndSize
-				+ (BrGlamorousWithExplicitContextMenuAptitude
-						itemsWithAnchorActions: [ self contextMenuItemsForSuperclass ]) ];
+		editorAptitude: [ BrGlamorousRegularEditorAptitude new glamorousFormEditorCodeFontAndSize];
 		labelAptitude: [ BrGlamorousLabelAptitude new glamorousFormLabelStyle ]
 ]
 
@@ -279,7 +307,7 @@ LcsSlotCreationForm >> slotClassName: anObject [
 
 { #category : #magritte }
 LcsSlotCreationForm >> slotClassNameDescription [
-	"<magritteDescription>"
+	<magritteDescription>
 	^ MAStringDescription new
 		label: 'Slot Class';
 		priority: 2;
@@ -311,34 +339,29 @@ LcsSlotCreationForm >> slotClassNameDescription [
 		labelAptitude: [ BrGlamorousLabelAptitude new glamorousFormLabelStyle ];
 		addCondition: [ :aValue | (self classNamed: aValue) notNil ] labelled: 'Unknown class';
 		addCondition: [ :aValue | self isInstanceSideClass: aValue ] labelled: 'Must be an instance-side class';
-		addCondition: [ :aValue | self isSlotClass: aValue ] labelled: 'Must be or a subclass of ' , self slotDefintionTypeClass name;
+		addCondition: [ :aValue | self isSlotClass: aValue ] labelled: 'Must be or a subclass of ' , self defaultSlotDefintionClass name;
 		beRequired
 ]
 
 { #category : #accessing }
-LcsSlotCreationForm >> slotDefintionTypeClass [	
-	^ self class slotDefintionTypeClass
+LcsSlotCreationForm >> slotDefinitionClass [
+	^ slotDefinitionClass
 ]
 
 { #category : #accessing }
-LcsSlotCreationForm >> slotName [
-	^ slotName
-]
-
-{ #category : #accessing }
-LcsSlotCreationForm >> slotName: anObject [
-	slotName := anObject
+LcsSlotCreationForm >> slotDefinitionClass: anObject [
+	slotDefinitionClass := anObject
 ]
 
 { #category : #magritte }
-LcsSlotCreationForm >> slotNameDescription [
+LcsSlotCreationForm >> slotDefinitionClassDescription [
 	<magritteDescription>
-	^ MAStringDescription new
-		label: 'Slot Name';
-		priority: 1;
-		accessor: #slotName;
-		blocCompletion: [ GtStringsCompletionStrategy new
-				completions: GtPharoIndex current classNameTree ];
+	^ MASingleOptionDescription new
+		reference: MAClassDescription new;
+		options: LcsSlotDefinition allSubclasses;
+		selectorAccessor: #'slotDefinitionClass';
+		label: 'Slot Definition Class';
+		priority: 2;
 		blocShortcuts: [ {BlShortcutWithAction new
 					name: 'Browse class';
 					description: 'Browses the class indicated by the editor';
@@ -358,36 +381,94 @@ LcsSlotCreationForm >> slotNameDescription [
 					action: [ :anEvent | 
 						anEvent target phlow
 							spawnObject: anEvent target text asString asClass gtReferences ]} ];
+		yourself
+]
+
+{ #category : #accessing }
+LcsSlotCreationForm >> slotName [
+	^ slotName
+]
+
+{ #category : #accessing }
+LcsSlotCreationForm >> slotName: anObject [
+	slotName := anObject
+]
+
+{ #category : #magritte }
+LcsSlotCreationForm >> slotNameDescription [
+	<magritteDescription>
+	| existingInstvarNames |
+	existingInstvarNames := self targetClass allInstVarNames.
+	^ GtMATextDescription new
+		label: 'Slot Name';
+		priority: 1;
+		accessor: #slotName;
+		kind: Object;
 		editorAptitude: [ BrGlamorousRegularEditorAptitude new glamorousFormEditorCodeFontAndSize
 				+ (BrGlamorousWithExplicitContextMenuAptitude
 						itemsWithAnchorActions: [ self contextMenuItemsForSuperclass ]) ];
 		labelAptitude: [ BrGlamorousLabelAptitude new glamorousFormLabelStyle ];
-		addCondition: [ :aValue | aValue trim notEmpty  ] labelled: 'Enter slot name';
-		addCondition: [ :aValue | aValue trim size >= 2 ] labelled: 'Slot name must be at least 2 characters';
+		addCondition: [ :aValue | aValue asString trim size >= 2 ] labelled: 'Enter a unique slot name of at least two characters in length';
+		addCondition: [ :aValue | (existingInstvarNames includes: aValue asString trim asSymbol) not ] labelled: 'Slot already exists';
 		beRequired
+
 ]
 
 { #category : #accessing }
-LcsSlotCreationForm >> slotType [
-	^ slotType
+LcsSlotCreationForm >> slotTypes [
+	^ slotTypes
 ]
 
 { #category : #accessing }
-LcsSlotCreationForm >> slotType: anObject [
-	slotType := anObject
+LcsSlotCreationForm >> slotTypes: anObject [
+	slotTypes := anObject
 ]
 
 { #category : #magritte }
-LcsSlotCreationForm >> slotTypeDescription [
+LcsSlotCreationForm >> slotTypesDescription [
 	<magritteDescription>
-	^ MASingleOptionDescription new
-		"reference: MAClassDescription new;"
-		options: LcsSlotDefinition allSubclasses;
-		selectorAccessor: 'slotType';
-		"groupBy: #grouping;"
-		label: 'Slot Type';
-		priority: 2;
-		yourself
+	^ MAToManyRelationDescription new
+		label: 'Slot Types';
+		priority: 30;
+		accessor: #slotTypes;
+		classes: {String};
+		labelAptitude: [ BrGlamorousLabelAptitude new glamorousFormLabelStyle ];
+		blocListStencil: (self
+				taggerStencilWithCompletion: GtClassesCompletionStrategy new
+				andContextMenuBlock: [ :aClass :anElement :aMemento | 
+					aMemento overallStatus valueOrNil isChanged
+						ifTrue: [ GtCoderContextMenuContent new editorElement: anElement ]
+						ifFalse: [ self createClassContextMenuContentFor: aClass editor: anElement ] ]);
+		blocShortcuts: [ {BlShortcutWithAction new
+					name: 'Browse class';
+					description: 'Browses the class indicated by the editor';
+					combination: BlKeyCombination primaryB;
+					action: [ :anEvent | 
+						anEvent target phlow
+							spawnTool: (GtClassCoderTool forClass: anEvent target text asString asClass) ].
+				BlShortcutWithAction new
+					name: 'Inspect class';
+					description: 'Inspects the class indicated by the editor';
+					combination: BlKeyCombination primaryG;
+					action: [ :anEvent | anEvent target phlow spawnObject: anEvent target text asString asClass ].
+				BlShortcutWithAction new
+					name: 'Browse class references';
+					description: 'Browses references to the class indicated by the editor';
+					combination: BlKeyCombination primaryN;
+					action: [ :anEvent | 
+						anEvent target phlow
+							spawnObject: anEvent target text asString asClass gtReferences ]} ];
+		addCondition: [ :aValue | aValue asSet size = aValue size ]
+			labelled: 'All class names must be unique';
+		addCondition: [ :aValue | 
+				aValue
+					allSatisfy: [ :eachClassName | (Smalltalk classOrTraitNamed: eachClassName asString trim) isNotNil ] ]
+			labelled: 'Unknown Class(s)';
+		addCondition: [ :aValue | 
+				| givenTraitsOrNils |
+				givenTraitsOrNils := self classesOrNilsFor: aValue.
+				givenTraitsOrNils allSatisfy: [ :each | each isNil or: [ each isClass ] ] ]
+			labelled: 'Only classes are allowed'
 ]
 
 { #category : #accessing }
