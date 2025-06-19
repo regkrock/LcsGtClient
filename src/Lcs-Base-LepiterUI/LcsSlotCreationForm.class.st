@@ -6,13 +6,14 @@ Class {
 		'packageAndTagName',
 		'onElementCreated',
 		'onReset',
-		'slotClassName',
 		'slotName',
 		'targetClass',
 		'allowNil',
 		'required',
 		'slotDefinitionClass',
-		'slotTypes'
+		'slotTypes',
+		'slotModel',
+		'slotModelBuilder'
 	],
 	#category : #'Lcs-Base-LepiterUI-Forms - Models'
 }
@@ -163,7 +164,12 @@ LcsSlotCreationForm >> hasPackageAndTag [
 { #category : #initialization }
 LcsSlotCreationForm >> initialize [ 
 	super initialize.
-	self slotTypes: OrderedCollection new
+	self slotTypes: OrderedCollection new.
+	self slotName: ''.
+	self allowNil: false.
+	self required: false.
+	self slotDefinitionClass: ''
+	
 ]
 
 { #category : #accessing }
@@ -296,22 +302,22 @@ LcsSlotCreationForm >> selectInNavigationModel: aNavigationModel anInstance: anI
 ]
 
 { #category : #accessing }
-LcsSlotCreationForm >> slotClassName [
-	^ slotClassName
+LcsSlotCreationForm >> slotDefinitionClass [
+	^ slotDefinitionClass
 ]
 
 { #category : #accessing }
-LcsSlotCreationForm >> slotClassName: anObject [
-	slotClassName := anObject
+LcsSlotCreationForm >> slotDefinitionClass: anObject [
+	slotDefinitionClass := anObject
 ]
 
 { #category : #magritte }
-LcsSlotCreationForm >> slotClassNameDescription [
+LcsSlotCreationForm >> slotDefinitionClassDescription [
 	<magritteDescription>
 	^ MAStringDescription new
-		label: 'Slot Class';
+		label: 'Slot Definition Class';
 		priority: 2;
-		accessor: #slotClassName;
+		accessor: #slotDefinitionClass;
 		blocCompletion: [ GtStringsCompletionStrategy new
 				completions: GtPharoIndex current classNameTree ];
 		blocShortcuts: [ {BlShortcutWithAction new
@@ -343,19 +349,10 @@ LcsSlotCreationForm >> slotClassNameDescription [
 		beRequired
 ]
 
-{ #category : #accessing }
-LcsSlotCreationForm >> slotDefinitionClass [
-	^ slotDefinitionClass
-]
-
-{ #category : #accessing }
-LcsSlotCreationForm >> slotDefinitionClass: anObject [
-	slotDefinitionClass := anObject
-]
-
 { #category : #magritte }
-LcsSlotCreationForm >> slotDefinitionClassDescription [
-	<magritteDescription>
+LcsSlotCreationForm >> slotDefinitionClassSingleOptionDescription [
+	"This is obsolete - it is being kept as a reference"
+	"<magritteDescription>"
 	^ MASingleOptionDescription new
 		reference: MAClassDescription new;
 		options: LcsSlotDefinition allSubclasses;
@@ -385,6 +382,26 @@ LcsSlotCreationForm >> slotDefinitionClassDescription [
 ]
 
 { #category : #accessing }
+LcsSlotCreationForm >> slotModel [
+	^ slotModel
+]
+
+{ #category : #accessing }
+LcsSlotCreationForm >> slotModel: anObject [
+	slotModel := anObject
+]
+
+{ #category : #accessing }
+LcsSlotCreationForm >> slotModelBuilder [
+	^ slotModelBuilder
+]
+
+{ #category : #accessing }
+LcsSlotCreationForm >> slotModelBuilder: anObject [
+	slotModelBuilder := anObject
+]
+
+{ #category : #accessing }
 LcsSlotCreationForm >> slotName [
 	^ slotName
 ]
@@ -399,17 +416,17 @@ LcsSlotCreationForm >> slotNameDescription [
 	<magritteDescription>
 	| existingInstvarNames |
 	existingInstvarNames := self targetClass allInstVarNames.
-	^ GtMATextDescription new
+	^ MAStringDescription new
 		label: 'Slot Name';
 		priority: 1;
 		accessor: #slotName;
-		kind: Object;
 		editorAptitude: [ BrGlamorousRegularEditorAptitude new glamorousFormEditorCodeFontAndSize
 				+ (BrGlamorousWithExplicitContextMenuAptitude
 						itemsWithAnchorActions: [ self contextMenuItemsForSuperclass ]) ];
 		labelAptitude: [ BrGlamorousLabelAptitude new glamorousFormLabelStyle ];
 		addCondition: [ :aValue | aValue asString trim size >= 2 ] labelled: 'Enter a unique slot name of at least two characters in length';
 		addCondition: [ :aValue | (existingInstvarNames includes: aValue asString trim asSymbol) not ] labelled: 'Slot already exists';
+		addCondition: [ :aValue | aValue asString trim asSymbol allSatisfy: [ :each | each isAlphaNumeric ] ] labelled: 'Slot Names can contain only alphanumerics';
 		beRequired
 
 ]

@@ -22,7 +22,7 @@ LcsAccessorSlotCreationForm class >> priority [
 { #category : #callback }
 LcsAccessorSlotCreationForm >> commit [
 	| builder |
-	builder := self slotDefinitionBuilder..
+	builder := self slotDefinitionBuilder.
 	builder
 		slotName: self slotName;
 		targetClass: self targetClass;
@@ -37,6 +37,6 @@ LcsAccessorSlotCreationForm >> slotDefinitionBuilder [
 		each slotDefinitionClass = self slotDefinitionClass 
 			ifTrue: [ each slotDefinitionClass new ]].
 	^ LcsSlotDefinitionBuilder new
-		slotDefinitionClassName: self slotDefinitionClass name asString;
+		slotDefinitionClassName: self slotDefinitionClass  asString;
 		yourself
 ]
