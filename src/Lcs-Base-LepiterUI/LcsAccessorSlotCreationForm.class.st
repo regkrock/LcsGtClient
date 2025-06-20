@@ -31,6 +31,19 @@ LcsAccessorSlotCreationForm >> commit [
 	builder execute
 ]
 
+{ #category : #'instance creation' }
+LcsAccessorSlotCreationForm >> initializeEditOn: aTargetClass [
+	self initializeOn: aTargetClass.
+	self mode: #edit
+
+]
+
+{ #category : #'instance creation' }
+LcsAccessorSlotCreationForm >> initializeOn: aTargetClass [ 
+	self targetClass: aTargetClass
+
+]
+
 { #category : #callback }
 LcsAccessorSlotCreationForm >> slotDefinitionBuilder [
 	LcsSlotDefinitionBuilder withAllSubclasses do: [ :each |

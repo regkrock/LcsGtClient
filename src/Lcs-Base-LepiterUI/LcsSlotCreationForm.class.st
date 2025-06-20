@@ -13,7 +13,8 @@ Class {
 		'slotDefinitionClass',
 		'slotTypes',
 		'slotModel',
-		'slotModelBuilder'
+		'slotModelBuilder',
+		'mode'
 	],
 	#category : #'Lcs-Base-LepiterUI-Forms - Models'
 }
@@ -34,13 +35,17 @@ LcsSlotCreationForm class >> isAdditionForm [
 ]
 
 { #category : #'instance creation' }
+LcsSlotCreationForm class >> newEditOn: aTargetClass [
+	^ self new 
+		initializeEditOn: aTargetClass;
+		yourself
+]
+
+{ #category : #'instance creation' }
 LcsSlotCreationForm class >> newOn: aTargetClass [
-	| instance |
-	instance := self new 
-		targetClass: aTargetClass;
-		yourself.
-	self assert: instance targetClass equals: aTargetClass.
-	^ instance
+	^ self new 
+		initializeOn: aTargetClass;
+		yourself
 ]
 
 { #category : #accessing }
@@ -83,7 +88,7 @@ LcsSlotCreationForm >> classNamed: aValue [
 	^ Smalltalk classNamed: aValue trim
 ]
 
-{ #category : #magritte }
+{ #category : #private }
 LcsSlotCreationForm >> classesOrNilsFor: aCollectionOfClassNames [ 
 	"Return collection of Class. If a Class does not exist, `nil` value is used."
 
@@ -172,6 +177,11 @@ LcsSlotCreationForm >> initialize [
 	
 ]
 
+{ #category : #testing }
+LcsSlotCreationForm >> isEditMode [
+	self mode = #edit
+]
+
 { #category : #accessing }
 LcsSlotCreationForm >> isInstanceSideClass: aValue [
 	| aClass |
@@ -211,6 +221,16 @@ LcsSlotCreationForm >> magritteCancelAction [
 					[ onReset ifNotNil: [ onReset value ] ] 
 						on: Error do: #debug ]);
 		beAlwaysEnabled
+]
+
+{ #category : #accessing }
+LcsSlotCreationForm >> mode [
+	^ mode
+]
+
+{ #category : #accessing }
+LcsSlotCreationForm >> mode: aString [ 
+	mode := aString
 ]
 
 { #category : #accessing }
