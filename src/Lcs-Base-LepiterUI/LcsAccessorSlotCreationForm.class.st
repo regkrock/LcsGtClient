@@ -4,52 +4,78 @@ Class {
 	#category : #'Lcs-Base-LepiterUI-Forms - Models'
 }
 
-{ #category : #accessing }
-LcsAccessorSlotCreationForm class >> componentName [
-	^ 'Accessing Slot'
-]
-
-{ #category : #accessing }
+{ #category : #configuration }
 LcsAccessorSlotCreationForm class >> defaultSlotDefintionClass [
 	^ LcsSlotDefinition
 ]
 
-{ #category : #accessing }
+{ #category : #configuration }
 LcsAccessorSlotCreationForm class >> priority [
 	^ 10
 ]
 
-{ #category : #callback }
-LcsAccessorSlotCreationForm >> commit [
-	| builder |
-	builder := self slotDefinitionBuilder.
-	builder
-		slotName: self slotName;
-		targetClass: self targetClass;
-		targetClassName: self targetClass name;
-		buildJobSteps.
-	builder execute
+{ #category : #configuration }
+LcsAccessorSlotCreationForm class >> slotComponentName [
+	^ 'Accessor'
 ]
 
-{ #category : #'instance creation' }
+{ #category : #magritte }
+LcsAccessorSlotCreationForm >> allowNilDescription [
+	<magritteDescription>
+	^ (self slotModelBuilder respondsTo: #allowNilDescription)
+		ifTrue: [ self slotModelBuilder allowNilDescription ]
+		ifFalse: [ nil ]
+]
+
+{ #category : #callback }
+LcsAccessorSlotCreationForm >> commit [
+	self slotModelBuilder execute
+]
+
+{ #category : #iniitialize }
 LcsAccessorSlotCreationForm >> initializeEditOn: aTargetClass [
 	self initializeOn: aTargetClass.
 	self mode: #edit
 
 ]
 
-{ #category : #'instance creation' }
+{ #category : #initiailize }
 LcsAccessorSlotCreationForm >> initializeOn: aTargetClass [ 
 	self targetClass: aTargetClass
 
 ]
 
+{ #category : #magritte }
+LcsAccessorSlotCreationForm >> requiredDescription [
+	<magritteDescription>
+	^ (self slotModelBuilder respondsTo: #requiredDescription)
+		ifTrue: [ self slotModelBuilder requiredDescription ]
+		ifFalse: [ nil ]
+]
+
 { #category : #callback }
-LcsAccessorSlotCreationForm >> slotDefinitionBuilder [
-	LcsSlotDefinitionBuilder withAllSubclasses do: [ :each |
-		each slotDefinitionClass = self slotDefinitionClass 
-			ifTrue: [ each slotDefinitionClass new ]].
-	^ LcsSlotDefinitionBuilder new
-		slotDefinitionClassName: self slotDefinitionClass  asString;
-		yourself
+LcsAccessorSlotCreationForm >> slotDefinitionClassChangedTo: aClassName [
+	self slotDefinitionClass: aClassName.
+	self slotModelBuilder: (
+		(self slotDefinitionBuilderClass new)
+			targetClass: self targetClass;
+			targetClassName: self targetClass name asString;
+			populateFrom: self slotDefinitionClass;
+			yourself)
+]
+
+{ #category : #magritte }
+LcsAccessorSlotCreationForm >> slotNameDescription [
+	<magritteDescription>
+	^ (self slotModelBuilder respondsTo: #slotName)
+		ifTrue: [ self slotModelBuilder slotNameDescription ]
+		ifFalse: [ nil ]
+]
+
+{ #category : #magritte }
+LcsAccessorSlotCreationForm >> slotTypesDescription [
+	<magritteDescription>
+	^ (self slotModelBuilder respondsTo: #slotTypesDescription)
+		ifTrue: [ self slotModelBuilder slotTypesDescription ]
+		ifFalse: [ nil ]
 ]

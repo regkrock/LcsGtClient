@@ -4,19 +4,19 @@ Class {
 	#category : #'Lcs-Base-LepiterUI-Forms - Models'
 }
 
-{ #category : #accessing }
-LcsVirtualSlotCreationForm class >> componentName [
-	^ 'Virtual'
-]
-
-{ #category : #accessing }
+{ #category : #configuration }
 LcsVirtualSlotCreationForm class >> defaultSlotDefintionClass [
 	^ LcsVirtualSlotDefinition
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #configuration }
 LcsVirtualSlotCreationForm class >> priority [
 	^ 30
+]
+
+{ #category : #configuration }
+LcsVirtualSlotCreationForm class >> slotComponentName [
+	^ 'Virtual'
 ]
 
 { #category : #callbacks }

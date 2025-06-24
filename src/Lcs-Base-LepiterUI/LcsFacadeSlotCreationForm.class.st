@@ -4,19 +4,19 @@ Class {
 	#category : #'Lcs-Base-LepiterUI-Forms - Models'
 }
 
-{ #category : #accessing }
-LcsFacadeSlotCreationForm class >> componentName [
-	^ 'Facade'
-]
-
-{ #category : #accessing }
+{ #category : #configuration }
 LcsFacadeSlotCreationForm class >> defaultSlotDefintionClass [
 	^ LcsFacadeSlot
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #configuration }
 LcsFacadeSlotCreationForm class >> priority [
 	^ 20
+]
+
+{ #category : #configuration }
+LcsFacadeSlotCreationForm class >> slotComponentName [
+	^ 'Facade'
 ]
 
 { #category : #callbacks }

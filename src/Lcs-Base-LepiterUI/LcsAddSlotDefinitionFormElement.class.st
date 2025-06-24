@@ -50,7 +50,7 @@ LcsAddSlotDefinitionFormElement >> gtCreationInterface: aParentElement [
 		contentTabs addTab: (
 			BrTab new
 				aptitude: BrGlamorousTabAptitude new;
-				label: each componentName;
+				label: each slotComponentName;
 				stencil: [ 
 					(self formCache
 						at: each
