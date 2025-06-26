@@ -29,20 +29,64 @@ LcsAccessorSlotCreationForm >> allowNilDescription [
 
 { #category : #callback }
 LcsAccessorSlotCreationForm >> commit [
-	self slotModelBuilder execute
+	self slotModelBuilder commit
 ]
 
-{ #category : #iniitialize }
-LcsAccessorSlotCreationForm >> initializeEditOn: aTargetClass [
-	self initializeOn: aTargetClass.
-	self mode: #edit
-
+{ #category : #'gt views' }
+LcsAccessorSlotCreationForm >> gtConstructionTreeFor: aView [
+	<gtView>
+	^ aView forward
+		title: 'Steps Tree';
+		priority: 98;
+		object: [  self slotModelBuilder ];
+		view: #gtConstructionTreeFor:
 ]
 
-{ #category : #initiailize }
-LcsAccessorSlotCreationForm >> initializeOn: aTargetClass [ 
-	self targetClass: aTargetClass
+{ #category : #'gt views' }
+LcsAccessorSlotCreationForm >> gtMagritteFor: aView [
+	^ (super gtMagritteFor: aView)
+		actionUpdateButton;
+		yourself
+]
 
+{ #category : #'gt views' }
+LcsAccessorSlotCreationForm >> gtRefactoringChangeOn: aView [
+	<gtView>
+	^ aView forward
+		title: 'Refactoring';
+		priority: 99.2;
+		object: [  self slotModelBuilder ];
+		view: #gtRefactoringChangeOn: 
+]
+
+{ #category : #'gt views' }
+LcsAccessorSlotCreationForm >> gtSlotBuilderFor: aView [
+	<gtView>
+	^ aView forward
+		title: 'Slot Builder';
+		priority: 98;
+		object: [  self slotModelBuilder ];
+		view: #gtRawFor:
+]
+
+{ #category : #'gt views' }
+LcsAccessorSlotCreationForm >> gtUMLFor: aView [
+	<gtView>
+	[ self slotModelBuilder ] value isNil ifTrue: [ ^ aView empty ].
+	^ aView forward
+		title: 'UML';
+		priority: 99;
+		object: [  self slotModelBuilder ];
+		view: #gtUMLFor:
+]
+
+{ #category : #magritte }
+LcsAccessorSlotCreationForm >> initialValueBlockDescription [
+	<magritteDescription>
+	self traceCr: 'LcsAccessorSlotCreationForm>>#initialValueBlockDescription slotModelBuilder: ' , self slotModelBuilder printString.
+	^ (self slotModelBuilder respondsTo: #initialValueBlockDescription)
+		ifTrue: [ self slotModelBuilder initialValueBlockDescription ]
+		ifFalse: [ nil ]
 ]
 
 { #category : #magritte }

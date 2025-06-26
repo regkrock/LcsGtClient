@@ -97,7 +97,7 @@ LcsUml >> associationColor [
 LcsUml >> exampleProposedClassesModel [
 	<gtExample>
 	| model |
-	model := LcsClassesModel new
+	model := LcsUmlModel2 new
 		add: (LcsExistingClassModel new modelClass: SequenceableCollection);
 		add: (LcsExistingClassModel new modelClass: ArrayedCollection);
 		add: (LcsProposedClassModel new

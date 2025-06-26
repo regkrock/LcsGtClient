@@ -14,12 +14,12 @@ Class {
 	#category : #'Lcs-Base-LepiterUI-Forms - Models'
 }
 
-{ #category : #accessing }
+{ #category : #configuration }
 LcsSlotCreationForm class >> defaultSlotDefintionClass [
 	^ LcsSlotDefinition
 ]
 
-{ #category : #accessing }
+{ #category : #testing }
 LcsSlotCreationForm class >> isAdditionForm [
 	^ true
 ]
@@ -38,7 +38,7 @@ LcsSlotCreationForm class >> newOn: aTargetClass [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : #configuration }
 LcsSlotCreationForm class >> priority [
 	^ self subclassResponsibility
 ]
@@ -52,7 +52,7 @@ LcsSlotCreationForm >> asElement [
 	^ viewModel asElement
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 LcsSlotCreationForm >> classNamed: aValue [
 	^ Smalltalk classNamed: aValue trim
 ]
@@ -87,7 +87,7 @@ LcsSlotCreationForm >> commitPackage [
 				ifNotEmpty: [ :aTagName | aPackage addClassTag: aTagName ] ]
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 LcsSlotCreationForm >> contextMenuItemsForSuperclass [
 	^ {'Browse references'
 			-> [ :aBrEditor | aBrEditor phlow spawnObject: aBrEditor text asString asClass gtReferences ]}
@@ -98,7 +98,7 @@ LcsSlotCreationForm >> defaultSlotDefintionClass [
 	^ self class defaultSlotDefintionClass
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 LcsSlotCreationForm >> ghostTextFor: aString [
 	^ BrGhostTextAttribute
 		for: (aString asRopedText glamorousFormEditorCodeFontAndSize foreground: Color lightGray)
@@ -122,11 +122,24 @@ LcsSlotCreationForm >> hasPackageAndTag [
 	^ true
 ]
 
-{ #category : #initialization }
+{ #category : #initialize }
 LcsSlotCreationForm >> initialize [ 
 	super initialize.
 	self slotDefinitionClass: ''
 	
+]
+
+{ #category : #initialize }
+LcsSlotCreationForm >> initializeEditOn: aTargetClass [
+	self initializeOn: aTargetClass.
+	self mode: #edit
+
+]
+
+{ #category : #initialize }
+LcsSlotCreationForm >> initializeOn: aTargetClass [ 
+	self targetClass: aTargetClass
+
 ]
 
 { #category : #testing }
@@ -217,7 +230,7 @@ LcsSlotCreationForm >> onReset: aBlock [
 	onReset := aBlock
 ]
 
-{ #category : #accessing }
+{ #category : #magritte }
 LcsSlotCreationForm >> packageAndTagDescription [
 	"<magritteDescription>"
 	^ GtPackageAndTagDescription new
@@ -251,7 +264,7 @@ LcsSlotCreationForm >> required: anObject [
 	required := anObject
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 LcsSlotCreationForm >> selectInNavigationModel: aNavigationModel anInstance: anInstance [
 	aNavigationModel selectPackage: anInstance package.
 
@@ -344,7 +357,7 @@ LcsSlotCreationForm >> targetClass: anObject [
 	targetClass := anObject
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 LcsSlotCreationForm >> toolFor: anInstance [
 	^ GtClassCoderTool forClass: anInstance
 ]

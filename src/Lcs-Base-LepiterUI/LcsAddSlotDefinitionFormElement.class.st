@@ -10,7 +10,7 @@ Class {
 	#category : #'Lcs-Base-LepiterUI-UI'
 }
 
-{ #category : #'gt views' }
+{ #category : #'instance creation' }
 LcsAddSlotDefinitionFormElement class >> newOn: aParentElement targetClass: aClass [
 	^ self new
 		initializeOn: aParentElement targetClass: aClass;
@@ -32,7 +32,7 @@ LcsAddSlotDefinitionFormElement >> formCache [
 	^ formCache
 ]
 
-{ #category : #initalize }
+{ #category : #accessing }
 LcsAddSlotDefinitionFormElement >> formCache: anObject [ 
 	formCache := anObject 
 ]
@@ -80,13 +80,13 @@ LcsAddSlotDefinitionFormElement >> gtCreationInterface: aParentElement [
 	^ contentTabs
 ]
 
-{ #category : #initalize }
+{ #category : #initialize }
 LcsAddSlotDefinitionFormElement >> initialize [ 
 	super initialize.
 	self formCache: Dictionary new
 ]
 
-{ #category : #'gt views' }
+{ #category : #initialize }
 LcsAddSlotDefinitionFormElement >> initializeOn: aParentElement targetClass: aClass [ 
 	self taregtClass: aClass.
 	self parentElement: aParentElement.
