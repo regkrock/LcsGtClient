@@ -5,8 +5,8 @@ Class {
 }
 
 { #category : #configuration }
-LcsAccessorSlotCreationForm class >> defaultSlotDefintionClass [
-	^ LcsSlotDefinition
+LcsAccessorSlotCreationForm class >> defaultSlotClass [
+	^ LcsAcessorSlot
 ]
 
 { #category : #configuration }
@@ -98,10 +98,10 @@ LcsAccessorSlotCreationForm >> requiredDescription [
 ]
 
 { #category : #callback }
-LcsAccessorSlotCreationForm >> slotDefinitionClassChangedTo: aClassName [
+LcsAccessorSlotCreationForm >> slotClassChangedTo: aClassName [
 	self slotDefinitionClass: aClassName.
 	self slotModelBuilder: (
-		(self slotDefinitionBuilderClass new)
+		(self slotBuilderClass new)
 			targetClass: self targetClass;
 			targetClassName: self targetClass name asString;
 			populateFrom: self slotDefinitionClass;

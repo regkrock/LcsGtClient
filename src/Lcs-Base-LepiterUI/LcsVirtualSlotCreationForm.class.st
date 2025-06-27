@@ -5,7 +5,7 @@ Class {
 }
 
 { #category : #configuration }
-LcsVirtualSlotCreationForm class >> defaultSlotDefintionClass [
+LcsVirtualSlotCreationForm class >> defaultSlotClass [
 	^ LcsVirtualSlotDefinition
 ]
 

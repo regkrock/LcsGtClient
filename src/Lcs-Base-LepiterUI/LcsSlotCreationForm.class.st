@@ -15,8 +15,8 @@ Class {
 }
 
 { #category : #configuration }
-LcsSlotCreationForm class >> defaultSlotDefintionClass [
-	^ LcsSlotDefinition
+LcsSlotCreationForm class >> defaultSlotClass [
+	^ LcsAcessorSlot
 ]
 
 { #category : #testing }
@@ -94,8 +94,8 @@ LcsSlotCreationForm >> contextMenuItemsForSuperclass [
 ]
 
 { #category : #configuration }
-LcsSlotCreationForm >> defaultSlotDefintionClass [	
-	^ self class defaultSlotDefintionClass
+LcsSlotCreationForm >> defaultSlotClass [	
+	^ self class defaultSlotClass
 ]
 
 { #category : #private }
@@ -159,8 +159,8 @@ LcsSlotCreationForm >> isSlotClass: aValue [
 	| class |
 	class := self classNamed: aValue.
 	class isNil ifTrue: [ ^ false ].
-	class = self defaultSlotDefintionClass ifTrue: [ ^ true ]. 
-	^ class inheritsFrom: self defaultSlotDefintionClass
+	class = self defaultSlotClass ifTrue: [ ^ true ]. 
+	^ class inheritsFrom: self defaultSlotClass
 ]
 
 { #category : #magritte }
@@ -276,36 +276,26 @@ LcsSlotCreationForm >> selectInNavigationModel: aNavigationModel anInstance: anI
 ]
 
 { #category : #private }
-LcsSlotCreationForm >> slotDefinitionBuilderClass [
-	LcsSlotDefinitionBuilder withAllSubclasses do: [ :each |
+LcsSlotCreationForm >> slotBuilderClass [
+	LcsAccessorSlotBuilder withAllSubclasses do: [ :each |
 		each slotDefinitionClass = self slotDefinitionClass asClass 
 			ifTrue: [ ^ each ]].
-	^ LcsSlotDefinitionBuilder
+	^ LcsAccessorSlotBuilder
 ]
 
 { #category : #accessing }
-LcsSlotCreationForm >> slotDefinitionClass [
-	^ slotDefinitionClass
-]
-
-{ #category : #accessing }
-LcsSlotCreationForm >> slotDefinitionClass: anObject [
-	slotDefinitionClass := anObject
-]
-
-{ #category : #accessing }
-LcsSlotCreationForm >> slotDefinitionClassChangedTo: aClassName [
+LcsSlotCreationForm >> slotClassChangedTo: aClassName [
 
 ]
 
 { #category : #magritte }
-LcsSlotCreationForm >> slotDefinitionClassDescription [
+LcsSlotCreationForm >> slotClassDescription [
 	<magritteDescription>
 	^ MAStringDescription new
 		label: 'Slot Definition Class';
 		autoAccept: true;
 		priority: 2;
-		accessor: (MASelectorAccessor read: #slotDefinitionClass write: #slotDefinitionClassChangedTo:) ;
+		accessor: (MASelectorAccessor read: #slotDefinitionClass write: #slotClassChangedTo:) ;
 		blocCompletion: [ GtStringsCompletionStrategy new
 				completions: GtPharoIndex current classNameTree ];
 		blocShortcuts: [ {BlShortcutWithAction new
@@ -333,8 +323,18 @@ LcsSlotCreationForm >> slotDefinitionClassDescription [
 		labelAptitude: [ BrGlamorousLabelAptitude new glamorousFormLabelStyle ];
 		addCondition: [ :aValue | (self classNamed: aValue) notNil ] labelled: 'Unknown class';
 		addCondition: [ :aValue | self isInstanceSideClass: aValue ] labelled: 'Must be an instance-side class';
-		addCondition: [ :aValue | self isSlotClass: aValue ] labelled: 'Must be or a subclass of ' , self defaultSlotDefintionClass name;
+		addCondition: [ :aValue | self isSlotClass: aValue ] labelled: 'Must be or a subclass of ' , self defaultSlotClass name;
 		beRequired
+]
+
+{ #category : #accessing }
+LcsSlotCreationForm >> slotDefinitionClass [
+	^ slotDefinitionClass
+]
+
+{ #category : #accessing }
+LcsSlotCreationForm >> slotDefinitionClass: anObject [
+	slotDefinitionClass := anObject
 ]
 
 { #category : #accessing }

@@ -5,7 +5,7 @@ Class {
 }
 
 { #category : #configuration }
-LcsFacadeSlotCreationForm class >> defaultSlotDefintionClass [
+LcsFacadeSlotCreationForm class >> defaultSlotClass [
 	^ LcsFacadeSlot
 ]
 
