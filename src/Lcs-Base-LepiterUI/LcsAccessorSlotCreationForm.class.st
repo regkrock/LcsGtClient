@@ -6,7 +6,7 @@ Class {
 
 { #category : #configuration }
 LcsAccessorSlotCreationForm class >> defaultSlotClass [
-	^ LcsAcessorSlot
+	^ LcsAccessorSlot
 ]
 
 { #category : #configuration }
