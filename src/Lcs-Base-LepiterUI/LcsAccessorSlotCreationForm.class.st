@@ -99,12 +99,12 @@ LcsAccessorSlotCreationForm >> requiredDescription [
 
 { #category : #callback }
 LcsAccessorSlotCreationForm >> slotClassChangedTo: aClassName [
-	self slotClass: aClassName.
+	self slotClassName: aClassName.
 	self slotModelBuilder: (
 		(self slotBuilderClass new)
 			targetClass: self targetClass;
 			targetClassName: self targetClass name asString;
-			populateFrom: self slotClass;
+			populateFrom: self slotClassName;
 			yourself)
 ]
 

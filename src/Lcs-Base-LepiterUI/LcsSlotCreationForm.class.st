@@ -9,7 +9,7 @@ Class {
 		'targetClass',
 		'slotModelBuilder',
 		'mode',
-		'slotClass'
+		'slotClassName'
 	],
 	#category : #'Lcs-Base-LepiterUI-Forms - Models'
 }
@@ -125,7 +125,7 @@ LcsSlotCreationForm >> hasPackageAndTag [
 { #category : #initialize }
 LcsSlotCreationForm >> initialize [ 
 	super initialize.
-	self slotClass: ''
+	self slotClassName: ''
 	
 ]
 
@@ -278,19 +278,9 @@ LcsSlotCreationForm >> selectInNavigationModel: aNavigationModel anInstance: anI
 { #category : #private }
 LcsSlotCreationForm >> slotBuilderClass [
 	LcsAccessorSlotBuilder withAllSubclasses do: [ :each |
-		each slotClass = self slotClass asClass 
+		each slotClass = self slotClassName asClass 
 			ifTrue: [ ^ each ]].
 	^ LcsAccessorSlotBuilder
-]
-
-{ #category : #accessing }
-LcsSlotCreationForm >> slotClass [
-	^ slotClass
-]
-
-{ #category : #accessing }
-LcsSlotCreationForm >> slotClass: anObject [
-	slotClass := anObject
 ]
 
 { #category : #accessing }
@@ -305,7 +295,7 @@ LcsSlotCreationForm >> slotClassDescription [
 		label: 'Slot Definition Class';
 		autoAccept: true;
 		priority: 2;
-		accessor: (MASelectorAccessor read: #slotClass write: #slotClassChangedTo:) ;
+		accessor: (MASelectorAccessor read: #slotClassName write: #slotClassChangedTo:) ;
 		blocCompletion: [ GtStringsCompletionStrategy new
 				completions: GtPharoIndex current classNameTree ];
 		blocShortcuts: [ {BlShortcutWithAction new
@@ -335,6 +325,16 @@ LcsSlotCreationForm >> slotClassDescription [
 		addCondition: [ :aValue | self isInstanceSideClass: aValue ] labelled: 'Must be an instance-side class';
 		addCondition: [ :aValue | self isSlotClass: aValue ] labelled: 'Must be or a subclass of ' , self defaultSlotClass name;
 		beRequired
+]
+
+{ #category : #accessing }
+LcsSlotCreationForm >> slotClassName [
+	^ slotClassName
+]
+
+{ #category : #accessing }
+LcsSlotCreationForm >> slotClassName: anObject [
+	slotClassName := anObject
 ]
 
 { #category : #accessing }
