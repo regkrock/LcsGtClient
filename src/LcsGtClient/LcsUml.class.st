@@ -1,7 +1,7 @@
 Class {
 	#name : #LcsUml,
 	#superclass : #Object,
-	#category : #LcsGtClient
+	#category : #'LcsGtClient-Core'
 }
 
 { #category : #'as yet unclassified' }
