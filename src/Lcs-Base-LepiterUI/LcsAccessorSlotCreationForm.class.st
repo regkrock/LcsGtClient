@@ -22,12 +22,16 @@ LcsAccessorSlotCreationForm class >> slotComponentName [
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> allowNilDescription [
 	<magritteDescription>
-	^ (self slotModelBuilder respondsTo: #allowNilDescription)
-		ifTrue: [ self slotModelBuilder allowNilDescription ]
-		ifFalse: [ nil ]
+	^ self magritteDescriptionFor: #allowNil
 ]
 
-{ #category : #callback }
+{ #category : #magritte }
+LcsAccessorSlotCreationForm >> collectionSlotName [
+	<magritteDescription>
+	^ self magritteDescriptionFor: #collectionSlotName
+]
+
+{ #category : #callbacks }
 LcsAccessorSlotCreationForm >> commit [
 	self slotModelBuilder commit
 ]
@@ -83,21 +87,29 @@ LcsAccessorSlotCreationForm >> gtUMLFor: aView [
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> initialValueBlockDescription [
 	<magritteDescription>
-	self traceCr: 'LcsAccessorSlotCreationForm>>#initialValueBlockDescription slotModelBuilder: ' , self slotModelBuilder printString.
-	^ (self slotModelBuilder respondsTo: #initialValueBlockDescription)
-		ifTrue: [ self slotModelBuilder initialValueBlockDescription ]
+	^ self magritteDescriptionFor: #initialValueBlock
+]
+
+{ #category : #magritte }
+LcsAccessorSlotCreationForm >> magritteDescriptionFor: aSlotNameSymbol [
+	^ (self slotModelBuilder respondsTo: aSlotNameSymbol)
+		ifTrue: [ self slotModelBuilder perform: ( aSlotNameSymbol , 'Description') asSymbol]
 		ifFalse: [ nil ]
+]
+
+{ #category : #magritte }
+LcsAccessorSlotCreationForm >> numberOfDecimalsDescription [
+	<magritteDescription>
+	^ self magritteDescriptionFor: #numberOfDecimals
 ]
 
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> requiredDescription [
 	<magritteDescription>
-	^ (self slotModelBuilder respondsTo: #requiredDescription)
-		ifTrue: [ self slotModelBuilder requiredDescription ]
-		ifFalse: [ nil ]
+	^ self magritteDescriptionFor: #required
 ]
 
-{ #category : #callback }
+{ #category : #callbacks }
 LcsAccessorSlotCreationForm >> slotClassChangedTo: aClassName [
 	self slotClassName: aClassName.
 	self slotModelBuilder: (
@@ -105,21 +117,18 @@ LcsAccessorSlotCreationForm >> slotClassChangedTo: aClassName [
 			targetClass: self targetClass;
 			targetClassName: self targetClass name asString;
 			populateFrom: self slotClassName;
+			buildJobSteps;
 			yourself)
 ]
 
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> slotNameDescription [
 	<magritteDescription>
-	^ (self slotModelBuilder respondsTo: #slotName)
-		ifTrue: [ self slotModelBuilder slotNameDescription ]
-		ifFalse: [ nil ]
+	^ self magritteDescriptionFor: #slotName
 ]
 
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> slotTypesDescription [
 	<magritteDescription>
-	^ (self slotModelBuilder respondsTo: #slotTypesDescription)
-		ifTrue: [ self slotModelBuilder slotTypesDescription ]
-		ifFalse: [ nil ]
+	^ self magritteDescriptionFor: #slotTypes
 ]

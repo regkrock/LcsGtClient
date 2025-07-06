@@ -138,6 +138,7 @@ LcsSlotCreationForm >> initializeEditOn: aTargetClass [
 
 { #category : #initialize }
 LcsSlotCreationForm >> initializeOn: aTargetClass [ 
+	self mode: #add.
 	self targetClass: aTargetClass
 
 ]
@@ -254,16 +255,6 @@ LcsSlotCreationForm >> packageAndTagName: anObject [
 	packageAndTagName := anObject
 ]
 
-{ #category : #accessing }
-LcsSlotCreationForm >> required [
-	^ required
-]
-
-{ #category : #accessing }
-LcsSlotCreationForm >> required: anObject [
-	required := anObject
-]
-
 { #category : #private }
 LcsSlotCreationForm >> selectInNavigationModel: aNavigationModel anInstance: anInstance [
 	aNavigationModel selectPackage: anInstance package.
@@ -283,7 +274,7 @@ LcsSlotCreationForm >> slotBuilderClass [
 	^ LcsAccessorSlotBuilder
 ]
 
-{ #category : #accessing }
+{ #category : #callbacks }
 LcsSlotCreationForm >> slotClassChangedTo: aClassName [
 
 ]
