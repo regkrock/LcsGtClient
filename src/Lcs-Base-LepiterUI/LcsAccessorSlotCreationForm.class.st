@@ -104,6 +104,12 @@ LcsAccessorSlotCreationForm >> numberOfDecimalsDescription [
 ]
 
 { #category : #magritte }
+LcsAccessorSlotCreationForm >> prevalidationTransformBlockDescription [
+	<magritteDescription>
+	^ self magritteDescriptionFor: #prevalidationTransformBlock
+]
+
+{ #category : #magritte }
 LcsAccessorSlotCreationForm >> requiredDescription [
 	<magritteDescription>
 	^ self magritteDescriptionFor: #required
