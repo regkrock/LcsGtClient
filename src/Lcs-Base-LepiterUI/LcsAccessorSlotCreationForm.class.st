@@ -20,6 +20,14 @@ LcsAccessorSlotCreationForm class >> slotComponentName [
 ]
 
 { #category : #magritte }
+LcsAccessorSlotCreationForm >> _magritteDescriptionFor: aSlotNameSymbol [
+	| aDescription |
+	aDescription :=  self slotModelBuilder perform: (aSlotNameSymbol , 'Description') asSymbol.
+	"aDescription accessor chainAccessor: { #slotModelBuilder. aSlotNameSymbol}."
+	^ aDescription
+]
+
+{ #category : #magritte }
 LcsAccessorSlotCreationForm >> allowNilDescription [
 	<magritteDescription>
 	^ self magritteDescriptionFor: #allowNil
@@ -93,8 +101,14 @@ LcsAccessorSlotCreationForm >> initialValueBlockDescription [
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> magritteDescriptionFor: aSlotNameSymbol [
 	^ (self slotModelBuilder respondsTo: aSlotNameSymbol)
-		ifTrue: [ self slotModelBuilder perform: ( aSlotNameSymbol , 'Description') asSymbol]
+		ifTrue: [ self _magritteDescriptionFor: aSlotNameSymbol ]
 		ifFalse: [ nil ]
+]
+
+{ #category : #magritte }
+LcsAccessorSlotCreationForm >> magritteDescriptionFor_: aSlotNameSymbol [
+	^ (self slotModelBuilder perform: (aSlotNameSymbol , 'Description') asSymbol)
+		accessor chainAccessor: #(slotModelBuilder initialValueBlock)
 ]
 
 { #category : #magritte }
