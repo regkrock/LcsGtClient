@@ -95,7 +95,10 @@ LcsAccessorSlotCreationForm >> gtUMLFor: aView [
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> initialValueBlockDescription [
 	<magritteDescription>
-	^ self magritteDescriptionFor: #initialValueBlock
+	| description |
+	description := self magritteDescriptionFor: #initialValueBlock.
+	description accessor accessors: #(slotModelBuilder initialValueBlock).
+	^ description
 ]
 
 { #category : #magritte }
@@ -120,7 +123,10 @@ LcsAccessorSlotCreationForm >> numberOfDecimalsDescription [
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> prevalidationTransformBlockDescription [
 	<magritteDescription>
-	^ self magritteDescriptionFor: #prevalidationTransformBlock
+	| description |
+	description := self magritteDescriptionFor: #prevalidationTransformBlock.
+	description accessor accessors: #(slotModelBuilder prevalidationTransformBlock).
+	^ description
 ]
 
 { #category : #magritte }
