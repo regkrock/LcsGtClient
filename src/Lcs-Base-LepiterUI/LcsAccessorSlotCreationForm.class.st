@@ -103,7 +103,7 @@ LcsAccessorSlotCreationForm >> initialValueBlockDescription [
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> magritteBlockDescriptionFor: aSlotNameSymbol accessors: aCollection [
 	| description |
-	description := self magritteDescriptionFor: #initialValueBlock.
+	description := self magritteDescriptionFor: aSlotNameSymbol.
 	description ifNotNil: [
 			description accessor accessors: aCollection ].
 	^ description
