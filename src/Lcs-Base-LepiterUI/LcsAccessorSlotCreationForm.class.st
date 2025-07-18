@@ -95,17 +95,16 @@ LcsAccessorSlotCreationForm >> gtUMLFor: aView [
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> initialValueBlockDescription [
 	<magritteDescription>
-	^ self 
-		magritteBlockDescriptionFor: #initialValueBlock 
-		accessors: #(slotModelBuilder initialValueBlock)
+	^ self magritteDelegatedDescriptionFor: #initialValueBlock
 ]
 
 { #category : #magritte }
-LcsAccessorSlotCreationForm >> magritteBlockDescriptionFor: aSlotNameSymbol accessors: aCollection [
+LcsAccessorSlotCreationForm >> magritteDelegatedDescriptionFor: aSlotNameSymbol [
 	| description |
 	description := self magritteDescriptionFor: aSlotNameSymbol.
 	description ifNotNil: [
-			description accessor accessors: aCollection ].
+			description accessor accessors addFirst: #slotModelBuilder.
+			self traceCr: aSlotNameSymbol , 'Pluggable accessor path: ' , description accessor accessors printString. ].
 	^ description
 ]
 
@@ -131,9 +130,7 @@ LcsAccessorSlotCreationForm >> numberOfDecimalsDescription [
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> prevalidationTransformBlockDescription [
 	<magritteDescription>
-	^ self 
-		magritteBlockDescriptionFor: #prevalidationTransformBlock 
-		accessors: #(slotModelBuilder prevalidationTransformBlock)
+	^ self magritteDelegatedDescriptionFor: #prevalidationTransformBlock
 ]
 
 { #category : #magritte }
@@ -163,5 +160,5 @@ LcsAccessorSlotCreationForm >> slotNameDescription [
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> slotTypesDescription [
 	<magritteDescription>
-	^ self magritteDescriptionFor: #slotTypes
+	^ self magritteDelegatedDescriptionFor: #slotTypes
 ]
