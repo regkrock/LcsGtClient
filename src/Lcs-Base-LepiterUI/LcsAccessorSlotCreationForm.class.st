@@ -19,11 +19,16 @@ LcsAccessorSlotCreationForm class >> slotComponentName [
 	^ 'Accessor'
 ]
 
-{ #category : #magritte }
-LcsAccessorSlotCreationForm >> _magritteDescriptionFor: aSlotNameSymbol [
-	| aDescription |
-	aDescription :=  self slotModelBuilder perform: (aSlotNameSymbol , 'Description') asSymbol.
-	"aDescription accessor chainAccessor: { #slotModelBuilder. aSlotNameSymbol}."
+{ #category : #'magritte - support' }
+LcsAccessorSlotCreationForm >> addAccessorToBeginningOfAccessPath: aDescription [
+	(aDescription accessor isKindOf: LcsMAPluggableAccessor) ifTrue: [ 
+		aDescription accessor addSelectorToStartOfAccessChain: #slotModelBuilder.
+		^aDescription ].
+			
+	(aDescription accessor isKindOf: MAAccessor) ifTrue: [ 
+		aDescription accessor: (MAChainAccessor accessors: {#slotModelBuilder. aDescription accessor selector}).
+		^ aDescription ].
+		
 	^ aDescription
 ]
 
@@ -34,7 +39,7 @@ LcsAccessorSlotCreationForm >> allowNilDescription [
 ]
 
 { #category : #magritte }
-LcsAccessorSlotCreationForm >> collectionSlotName [
+LcsAccessorSlotCreationForm >> collectionSlotNameDescription [
 	<magritteDescription>
 	^ self magritteDescriptionFor: #collectionSlotName
 ]
@@ -95,30 +100,19 @@ LcsAccessorSlotCreationForm >> gtUMLFor: aView [
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> initialValueBlockDescription [
 	<magritteDescription>
-	^ self magritteDelegatedDescriptionFor: #initialValueBlock
+	^ self magritteDescriptionFor: #initialValueBlock
 ]
 
-{ #category : #magritte }
-LcsAccessorSlotCreationForm >> magritteDelegatedDescriptionFor: aSlotNameSymbol [
-	| description |
-	description := self magritteDescriptionFor: aSlotNameSymbol.
-	description ifNotNil: [
-			description accessor accessors addFirst: #slotModelBuilder.
-			self traceCr: aSlotNameSymbol , 'Pluggable accessor path: ' , description accessor accessors printString. ].
-	^ description
-]
-
-{ #category : #magritte }
+{ #category : #'magritte - support' }
 LcsAccessorSlotCreationForm >> magritteDescriptionFor: aSlotNameSymbol [
-	^ (self slotModelBuilder respondsTo: aSlotNameSymbol)
-		ifTrue: [ self _magritteDescriptionFor: aSlotNameSymbol ]
-		ifFalse: [ nil ]
-]
-
-{ #category : #magritte }
-LcsAccessorSlotCreationForm >> magritteDescriptionFor_: aSlotNameSymbol [
-	^ (self slotModelBuilder perform: (aSlotNameSymbol , 'Description') asSymbol)
-		accessor chainAccessor: #(slotModelBuilder initialValueBlock)
+	| aDescription |
+	
+	(self slotModelBuilder respondsTo: aSlotNameSymbol) ifFalse: [ ^ nil ].
+	
+	aDescription := self slotModelBuilder perform: (aSlotNameSymbol , 'Description') asSymbol.
+	
+	self addAccessorToBeginningOfAccessPath: aDescription.
+	^ aDescription
 ]
 
 { #category : #magritte }
@@ -130,7 +124,7 @@ LcsAccessorSlotCreationForm >> numberOfDecimalsDescription [
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> prevalidationTransformBlockDescription [
 	<magritteDescription>
-	^ self magritteDelegatedDescriptionFor: #prevalidationTransformBlock
+	^ self magritteDescriptionFor: #prevalidationTransformBlock
 ]
 
 { #category : #magritte }
@@ -160,5 +154,5 @@ LcsAccessorSlotCreationForm >> slotNameDescription [
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> slotTypesDescription [
 	<magritteDescription>
-	^ self magritteDelegatedDescriptionFor: #slotTypes
+	^ self magritteDescriptionFor: #slotTypes
 ]
