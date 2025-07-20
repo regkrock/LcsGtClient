@@ -25,7 +25,7 @@ LcsAccessorSlotCreationForm >> addAccessorToBeginningOfAccessPath: aDescription 
 		aDescription accessor addSelectorToStartOfAccessChain: #slotModelBuilder.
 		^aDescription ].
 			
-	(aDescription accessor isKindOf: MAAccessor) ifTrue: [ 
+	(aDescription accessor isKindOf: MASelectorAccessor) ifTrue: [ 
 		aDescription accessor: (MAChainAccessor accessors: {#slotModelBuilder. aDescription accessor selector}).
 		^ aDescription ].
 		
