@@ -19,6 +19,18 @@ LcsAccessorSlotCreationForm class >> slotComponentName [
 	^ 'Accessor'
 ]
 
+{ #category : #'as yet unclassified' }
+LcsAccessorSlotCreationForm >> accessPathFrom: anMAChainAccessor [
+	| accessor path|
+	path := OrderedCollection new.
+	accessor := anMAChainAccessor. 
+	[ accessor respondsTo: #next ] whileTrue: [
+		path add: accessor accessor selector.
+		accessor := accessor next ]. 
+	path add: accessor selector.
+	^ path
+]
+
 { #category : #'magritte - support' }
 LcsAccessorSlotCreationForm >> addAccessorToBeginningOfAccessPath: aDescription [
 	(aDescription accessor isKindOf: LcsMAPluggableAccessor) ifTrue: [ 
@@ -27,6 +39,14 @@ LcsAccessorSlotCreationForm >> addAccessorToBeginningOfAccessPath: aDescription 
 			
 	(aDescription accessor isKindOf: MASelectorAccessor) ifTrue: [ 
 		aDescription accessor: (MAChainAccessor accessors: {#slotModelBuilder. aDescription accessor selector}).
+		^ aDescription ].
+		
+	(aDescription accessor isKindOf: MAChainAccessor) ifTrue: [ 
+		aDescription accessor: (
+			MAChainAccessor accessors: ( 
+				(self accessPathFrom: aDescription accessor )
+					addFirst: #slotModelBuilder;
+					yourself)).
 		^ aDescription ].
 		
 	^ aDescription
@@ -148,11 +168,29 @@ LcsAccessorSlotCreationForm >> slotClassChangedTo: aClassName [
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> slotNameDescription [
 	<magritteDescription>
-	^ self magritteDescriptionFor: #slotName
+	^ (self magritteDescriptionFor: #slotName) ifNotNil: [ :description |
+		description
+			priority: 4;
+			yourself ]
 ]
 
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> slotTypesDescription [
 	<magritteDescription>
 	^ self magritteDescriptionFor: #slotTypes
+]
+
+{ #category : #magritte }
+LcsAccessorSlotCreationForm >> targetClassDescription [
+	<magritteDescription>
+	^ (self magritteDescriptionFor: #targetClass) ifNotNil: [ :description |
+		description
+			priority: 3;
+			yourself ]
+]
+
+{ #category : #magritte }
+LcsAccessorSlotCreationForm >> validationConditionsDescription [
+	<magritteDescription>
+	^ self magritteDescriptionFor: #validationConditions
 ]
