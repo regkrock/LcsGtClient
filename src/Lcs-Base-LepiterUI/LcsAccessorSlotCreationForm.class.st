@@ -19,7 +19,7 @@ LcsAccessorSlotCreationForm class >> slotComponentName [
 	^ 'Accessor'
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 LcsAccessorSlotCreationForm >> accessPathFrom: anMAChainAccessor [
 	| accessor path|
 	path := OrderedCollection new.
@@ -66,61 +66,33 @@ LcsAccessorSlotCreationForm >> collectionSlotNameDescription [
 
 { #category : #callbacks }
 LcsAccessorSlotCreationForm >> commit [
-	self slotModelBuilder commit
-]
-
-{ #category : #'gt views' }
-LcsAccessorSlotCreationForm >> gtConstructionTreeFor: aView [
-	<gtView>
-	^ aView forward
-		title: 'Steps Tree';
-		priority: 98;
-		object: [  self slotModelBuilder ];
-		view: #gtConstructionTreeFor:
-]
-
-{ #category : #'gt views' }
-LcsAccessorSlotCreationForm >> gtMagritteFor: aView [
-	^ (super gtMagritteFor: aView)
-		actionUpdateButton;
-		yourself
-]
-
-{ #category : #'gt views' }
-LcsAccessorSlotCreationForm >> gtRefactoringChangeOn: aView [
-	<gtView>
-	^ aView forward
-		title: 'Refactoring';
-		priority: 99.2;
-		object: [  self slotModelBuilder ];
-		view: #gtRefactoringChangeOn: 
-]
-
-{ #category : #'gt views' }
-LcsAccessorSlotCreationForm >> gtSlotBuilderFor: aView [
-	<gtView>
-	^ aView forward
-		title: 'Slot Builder';
-		priority: 98;
-		object: [  self slotModelBuilder ];
-		view: #gtRawFor:
-]
-
-{ #category : #'gt views' }
-LcsAccessorSlotCreationForm >> gtUMLFor: aView [
-	<gtView>
-	[ self slotModelBuilder ] value isNil ifTrue: [ ^ aView empty ].
-	^ aView forward
-		title: 'UML';
-		priority: 99;
-		object: [  self slotModelBuilder ];
-		view: #gtUMLFor:
+	self error: 'Do not use this'.
+	"self slotModelBuilder commit"
 ]
 
 { #category : #magritte }
 LcsAccessorSlotCreationForm >> initialValueBlockDescription [
 	<magritteDescription>
 	^ self magritteDescriptionFor: #initialValueBlock
+]
+
+{ #category : #magritte }
+LcsAccessorSlotCreationForm >> magritteBuildAction [
+	<magritteActionDescription>
+	self isSlotModelBuilderNotReified ifTrue: [ ^ nil ].
+	^ MAActionDescription new
+		priority: 30;
+		label: 'Build';
+		beToolbarAction;
+		blocIcon: BrGlamorousVectorIcons play;
+		action: (GtMagritteAction new
+				beInUIProcess;
+				action: [ :aModel :aButton :aMemento :aDescription | aModel slotModelBuilder execute ]);
+		onOverallStatusChanged: (GtMagritteBasicAction new
+			action: [ :aStatus :aButton :aMemento :aDescription |
+				aStatus isChanged
+					ifTrue: [ aDescription enabled: false ]
+					ifFalse: [ aDescription enabled: aStatus isValidAndInactive ] ])
 ]
 
 { #category : #'magritte - support' }
@@ -133,6 +105,20 @@ LcsAccessorSlotCreationForm >> magritteDescriptionFor: aSlotNameSymbol [
 	
 	self addAccessorToBeginningOfAccessPath: aDescription.
 	^ aDescription
+]
+
+{ #category : #magritte }
+LcsAccessorSlotCreationForm >> magritteInspectAction [
+	"<magritteActionDescription>"
+	^ MAActionDescription new
+		priority: 30;
+		label: 'Inspect';
+		blocIcon: BrGlamorousVectorIcons inspect;
+		action: (GtMagritteAction new
+				beInUIProcess;
+				action: [ :aModel :aButton :aMemento :aDescription | 
+					aButton phlow spawnObject: aMemento ]);
+		beToolbarAction
 ]
 
 { #category : #magritte }
@@ -156,13 +142,7 @@ LcsAccessorSlotCreationForm >> requiredDescription [
 { #category : #callbacks }
 LcsAccessorSlotCreationForm >> slotClassChangedTo: aClassName [
 	self slotClassName: aClassName.
-	self slotModelBuilder: (
-		(self slotBuilderClass new)
-			targetClass: self targetClass;
-			targetClassName: self targetClass name asString;
-			populateFrom: self slotClassName;
-			buildJobSteps;
-			yourself)
+	self reifySlotModelBuilder
 ]
 
 { #category : #magritte }
@@ -170,6 +150,7 @@ LcsAccessorSlotCreationForm >> slotNameDescription [
 	<magritteDescription>
 	^ (self magritteDescriptionFor: #slotName) ifNotNil: [ :description |
 		description
+			default: '';
 			priority: 4;
 			yourself ]
 ]
@@ -187,6 +168,12 @@ LcsAccessorSlotCreationForm >> targetClassDescription [
 		description
 			priority: 3;
 			yourself ]
+]
+
+{ #category : #magritte }
+LcsAccessorSlotCreationForm >> validationConditionItemsDescription [
+	"<magritteDescription>"
+	^ self magritteDescriptionFor: #validationConditionItems
 ]
 
 { #category : #magritte }

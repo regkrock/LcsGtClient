@@ -104,6 +104,16 @@ LcsSlotCreationForm >> ghostTextFor: aString [
 		for: (aString asRopedText glamorousFormEditorCodeFontAndSize foreground: Color lightGray)
 ]
 
+{ #category : #'gt views' }
+LcsSlotCreationForm >> gtConstructionTreeFor: aView [
+	<gtView>
+	^ aView forward
+		title: 'Steps Tree';
+		priority: 98;
+		object: [  self slotModelBuilder ];
+		view: #gtConstructionTreeFor:
+]
+
 { #category : #'gt view' }
 LcsSlotCreationForm >> gtInspectView: view [
 	"<gtView>"
@@ -117,6 +127,47 @@ LcsSlotCreationForm >> gtInspectView: view [
 				action: [ :aButton | aButton phlow spawnObject: self ] ]
 ]
 
+{ #category : #'gt views' }
+LcsSlotCreationForm >> gtRefactoringChangeOn: aView [
+	<gtView>
+	^ aView forward
+		title: 'Refactoring';
+		priority: 99.2;
+		object: [  self slotModelBuilder ];
+		view: #gtRefactoringChangeOn: 
+]
+
+{ #category : #'gt views' }
+LcsSlotCreationForm >> gtSlotBuilderFor: aView [
+	<gtView>
+	^ aView forward
+		title: 'Slot Builder';
+		priority: 99.6;
+		object: [  self slotModelBuilder ];
+		view: #gtRawFor:
+]
+
+{ #category : #'gt views' }
+LcsSlotCreationForm >> gtSlotBuilderMetaFor: aView [
+	<gtView>
+	^ aView forward
+		title: 'Slot Builder Meta';
+		priority: 99.7;
+		object: [  self slotModelBuilder ];
+		view: #gtMetaFor:
+]
+
+{ #category : #'gt views' }
+LcsSlotCreationForm >> gtUMLFor: aView [
+	<gtView>
+	^ aView forward
+		title: 'UML';
+		priority: 99;
+		object: [  self slotModelBuilder ];
+		view: #gtUMLFor:;
+		actionUpdateButton
+]
+
 { #category : #testing }
 LcsSlotCreationForm >> hasPackageAndTag [
 	^ true
@@ -125,8 +176,8 @@ LcsSlotCreationForm >> hasPackageAndTag [
 { #category : #initialize }
 LcsSlotCreationForm >> initialize [ 
 	super initialize.
-	self slotClassName: ''
-	
+	self slotClassName: ''.
+	self slotModelBuilder: LcsCodeBuilderStep new
 ]
 
 { #category : #initialize }
@@ -164,18 +215,22 @@ LcsSlotCreationForm >> isSlotClass: aValue [
 	^ class inheritsFrom: self defaultSlotClass
 ]
 
+{ #category : #testing }
+LcsSlotCreationForm >> isSlotModelBuilderNotReified [
+	^ self slotModelBuilder class = LcsCodeBuilderStep
+]
+
+{ #category : #testing }
+LcsSlotCreationForm >> isSlotModelBuilderReified [
+	^ self slotModelBuilder class ~= LcsCodeBuilderStep
+]
+
 { #category : #magritte }
 LcsSlotCreationForm >> magritteAcceptAction [
 	<magritteActionDescription>
-	^ super magritteAcceptAction
-		label: 'Create';
-		onSuccessCallback: (GtMagritteCallback new
-				action: [ :aModel :aButton :aMemento :aDescription | 
-					[ | aClass |
-					aClass := self commit.
-					onAccept ifNotNil: [ onAccept value: aClass ] ] 
-						on: Error do: #debug ]);
-		beEnabledOnValidOverallStatus
+	^ self slotModelBuilder class = LcsCodeBuilderStep 
+		ifTrue: [ self magritteOpenSlotModelBuilderAcceptAction ]
+		ifFalse: [ self magritteUpdateSlotModelBuilderAcceptAction ]
 ]
 
 { #category : #magritte }
@@ -187,6 +242,33 @@ LcsSlotCreationForm >> magritteCancelAction [
 					[ onReset ifNotNil: [ onReset value ] ] 
 						on: Error do: #debug ]);
 		beAlwaysEnabled
+]
+
+{ #category : #magritte }
+LcsSlotCreationForm >> magritteOpenSlotModelBuilderAcceptAction [
+	^ super magritteAcceptAction
+		label: 'Open Builder';
+		action: (
+			GtMagritteAction new
+				beInFutureProcess;
+				beWithFutureResponse;
+				action: [ :aModel :aButton :aMemento :aDescription | 
+					aModel reifySlotModelBuilder.
+					aButton phlow fireViewUpdateWish ]);
+		beEnabledOnValidOverallStatus
+]
+
+{ #category : #magritte }
+LcsSlotCreationForm >> magritteUpdateSlotModelBuilderAcceptAction [
+	^ super magritteAcceptAction
+		label: 'Update Builder';
+		action: (
+			GtMagritteAction new
+				beInFutureProcess;
+				beWithFutureResponse;
+				action: [ :aModel :aButton :aMemento :aDescription | 
+					aMemento commit ]);
+		beEnabledOnValidOverallStatus
 ]
 
 { #category : #accessing }
@@ -255,6 +337,17 @@ LcsSlotCreationForm >> packageAndTagName: anObject [
 	packageAndTagName := anObject
 ]
 
+{ #category : #callbacks }
+LcsSlotCreationForm >> reifySlotModelBuilder [
+	self
+		slotModelBuilder: (self slotBuilderClass new
+				targetClass: self targetClass;
+				targetClassName: self targetClass name asString;
+				populateFrom: self slotClassName;
+				buildJobSteps;
+				yourself)
+]
+
 { #category : #private }
 LcsSlotCreationForm >> selectInNavigationModel: aNavigationModel anInstance: anInstance [
 	aNavigationModel selectPackage: anInstance package.
@@ -286,7 +379,9 @@ LcsSlotCreationForm >> slotClassDescription [
 		label: 'Slot Definition Class';
 		autoAccept: true;
 		priority: 2;
+		default: '';
 		accessor: (MASelectorAccessor read: #slotClassName write: #slotClassChangedTo:) ;
+		readOnly: self isSlotModelBuilderReified;
 		blocCompletion: [ GtStringsCompletionStrategy new
 				completions: GtPharoIndex current classNameTree ];
 		blocShortcuts: [ {BlShortcutWithAction new
@@ -312,8 +407,6 @@ LcsSlotCreationForm >> slotClassDescription [
 				+ (BrGlamorousWithExplicitContextMenuAptitude
 						itemsWithAnchorActions: [ self contextMenuItemsForSuperclass ]) ];
 		labelAptitude: [ BrGlamorousLabelAptitude new glamorousFormLabelStyle ];
-		addCondition: [ :aValue | (self classNamed: aValue) notNil ] labelled: 'Unknown class';
-		addCondition: [ :aValue | self isInstanceSideClass: aValue ] labelled: 'Must be an instance-side class';
 		addCondition: [ :aValue | self isSlotClass: aValue ] labelled: 'Must be or a subclass of ' , self defaultSlotClass name;
 		beRequired
 ]
@@ -351,4 +444,10 @@ LcsSlotCreationForm >> targetClass: anObject [
 { #category : #private }
 LcsSlotCreationForm >> toolFor: anInstance [
 	^ GtClassCoderTool forClass: anInstance
+]
+
+{ #category : #magritte }
+LcsSlotCreationForm >> visualizeSlotModelBuilderVia: aButton [
+	^ aButton "parent parent parent parent parent parent parent" phlow
+		fireViewUpdateWish
 ]
