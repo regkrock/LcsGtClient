@@ -87,7 +87,10 @@ LcsAccessorSlotCreationForm >> magritteBuildAction [
 		blocIcon: BrGlamorousVectorIcons play;
 		action: (GtMagritteAction new
 				beInUIProcess;
-				action: [ :aModel :aButton :aMemento :aDescription | aModel slotModelBuilder execute ]);
+				action: [ :aModel :aButton :aMemento :aDescription | 
+					aModel slotModelBuilder execute.
+					aModel initializeSlotTypeClassAndBuilderClass.
+					aButton phlow fireViewUpdateWish ]);
 		onOverallStatusChanged: (GtMagritteBasicAction new
 			action: [ :aStatus :aButton :aMemento :aDescription |
 				aStatus isChanged

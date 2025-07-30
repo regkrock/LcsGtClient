@@ -174,10 +174,9 @@ LcsSlotCreationForm >> hasPackageAndTag [
 ]
 
 { #category : #initialize }
-LcsSlotCreationForm >> initialize [ 
+LcsSlotCreationForm >> initialize [
 	super initialize.
-	self slotClassName: ''.
-	self slotModelBuilder: LcsCodeBuilderStep new
+	self initializeSlotTypeClassAndBuilderClass
 ]
 
 { #category : #initialize }
@@ -192,6 +191,12 @@ LcsSlotCreationForm >> initializeOn: aTargetClass [
 	self mode: #add.
 	self targetClass: aTargetClass
 
+]
+
+{ #category : #initialize }
+LcsSlotCreationForm >> initializeSlotTypeClassAndBuilderClass [
+	self slotClassName: ''.
+	self slotModelBuilder: LcsCodeBuilderStep new
 ]
 
 { #category : #testing }
