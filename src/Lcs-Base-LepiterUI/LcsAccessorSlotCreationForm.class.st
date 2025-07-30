@@ -153,7 +153,6 @@ LcsAccessorSlotCreationForm >> slotNameDescription [
 	<magritteDescription>
 	^ (self magritteDescriptionFor: #slotName) ifNotNil: [ :description |
 		description
-			default: '';
 			priority: 4;
 			yourself ]
 ]

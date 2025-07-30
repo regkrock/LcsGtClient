@@ -385,10 +385,9 @@ LcsSlotCreationForm >> slotClassDescription [
 		autoAccept: true;
 		priority: 2;
 		default: '';
-		accessor: (MASelectorAccessor read: #slotClassName write: #slotClassChangedTo:) ;
+		accessor: (MASelectorAccessor read: #slotClassName write: #slotClassChangedTo:);
 		readOnly: self isSlotModelBuilderReified;
-		blocCompletion: [ GtStringsCompletionStrategy new
-				completions: GtPharoIndex current classNameTree ];
+		blocCompletion: [ GtStringsCompletionStrategy new completions: self slotClasses ];
 		blocShortcuts: [ {BlShortcutWithAction new
 					name: 'Browse class';
 					description: 'Browses the class indicated by the editor';
@@ -412,7 +411,8 @@ LcsSlotCreationForm >> slotClassDescription [
 				+ (BrGlamorousWithExplicitContextMenuAptitude
 						itemsWithAnchorActions: [ self contextMenuItemsForSuperclass ]) ];
 		labelAptitude: [ BrGlamorousLabelAptitude new glamorousFormLabelStyle ];
-		addCondition: [ :aValue | self isSlotClass: aValue ] labelled: 'Must be or a subclass of ' , self defaultSlotClass name;
+		addCondition: [ :aValue | self isSlotClass: aValue ]
+			labelled: 'Must be or a subclass of ' , self defaultSlotClass name;
 		beRequired
 ]
 
@@ -424,6 +424,13 @@ LcsSlotCreationForm >> slotClassName [
 { #category : #accessing }
 LcsSlotCreationForm >> slotClassName: anObject [
 	slotClassName := anObject
+]
+
+{ #category : #magritte }
+LcsSlotCreationForm >> slotClasses [
+	^ GtPrefixTree
+		withAll: ((LcsAccessorSlot withAllSubclasses reject: [ :each | each isAbstract ])
+				collect: [ :each | each name ])
 ]
 
 { #category : #accessing }
