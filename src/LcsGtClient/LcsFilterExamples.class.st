@@ -1,96 +1,194 @@
 Class {
 	#name : #LcsFilterExamples,
 	#superclass : #Object,
+	#instVars : [
+		'subscriptionRegistry',
+		'subscriptions',
+		'gtFilterItemsElement',
+		'currentFilterModel'
+	],
 	#category : #'LcsGtClient-Examples'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #examples }
 LcsFilterExamples >> booleanFilterLabel: aLabel value: anInitialValue [
-	| fElement subscriptions booleanModel subscriptionRegistry |
-
-	booleanModel :=GtFilterBooleanModel new
-			switchedOn: anInitialValue;
-			name: aLabel.
-
-	subscriptionRegistry := booleanModel announcer subscriptions.
-	subscriptions := subscriptionRegistry subscriptions.
-
-	self assert: subscriptions isEmpty.
-
-	fElement := booleanModel asFilterViewModel.
+	| fElement |
 	"fElement := booleanModel asFilterLabeledElement."
-	
-	self assert: subscriptions size equals: 2.
+	self currentFilterModel: (GtFilterBooleanModel new
+			switchedOn: anInitialValue;
+			name: aLabel).
+	self assert: self subscriptions isEmpty.
+	fElement := self currentFilterModel asFilterViewModel.
+	self assert: self subscriptions size equals: 2.
+	self assert: (self subscriptionRegistry subscriptionsForClass: GtFilterModelLabelChanged) isEmpty.
+	self assert: (self subscriptionRegistry subscriptionsForClass: GtFilterBooleanViewModelSwitchChanged) isEmpty.
 	self
-		assert: (subscriptionRegistry subscriptionsForClass: GtFilterModelLabelChanged) isEmpty.
-	self
-		assert: (subscriptionRegistry
-				subscriptionsForClass: GtFilterBooleanViewModelSwitchChanged) isEmpty.
-	self
-		assert: (subscriptions
+		assert: (self subscriptions
 				detect: [ :each | each announcementClass = GtFilterModelLabelChanged ]
 				ifNone: [  ]) notNil.
 	self
-		assert: (subscriptions
+		assert: (self subscriptions
 				detect: [ :each | each announcementClass = GtFilterBooleanModelSwitchChanged ]
 				ifNone: [  ]) notNil.
-	^ booleanModel
+	^ self currentFilterModel
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #examples }
+LcsFilterExamples >> classInstanceShortListModel [
+	<gtExample>
+	<return: #GtFilterShortListModel>
+	
+	self currentFilterModel: (GtFilterShortListModel new
+			items: self instanceAndClassItems;
+			selectedItem: 'class';
+			name: 'Side').
+	self assert: self subscriptions isEmpty.
+	self
+		assert: self currentFilterModel itemsFuture wait
+		equals: (self instanceAndClassItems collect: #asFilterModelItem).
+	self assert: self currentFilterModel selectedItem equals: 'class' asFilterModelItem.
+
+	self currentFilterModel asFilterLabeledElement.
+
+	self subscriptions.
+	self currentFilterModel weak
+		when: GtFiltersModelItemsChanged
+		do: [ Transcript crShow: 'class/instance selection changed1' ].
+
+	^ self currentFilterModel
+]
+
+{ #category : #examples }
 LcsFilterExamples >> completedBooleanModel [
 	<gtExample>
 	^ self booleanFilterLabel: 'Completed' value: true.
 ]
 
-{ #category : #examples }
-LcsFilterExamples >> filtersModel [
-	<gtExample>
-	| block startedBooleanModel completedBooleanModel fElement aModelUsingAdd |
-	block := [ Transcript crShow: 'model updated' ].
+{ #category : #accessing }
+LcsFilterExamples >> currentFilterModel [
+	^ currentFilterModel
+]
 
+{ #category : #accessing }
+LcsFilterExamples >> currentFilterModel: anObject [
+	currentFilterModel := anObject.
+	self subscriptionRegistry: self currentFilterModel announcer subscriptions.
+	self subscriptions: self subscriptionRegistry subscriptions.
+
+]
+
+{ #category : #transcript }
+LcsFilterExamples >> filterItemRemoved: anAnouncement [
+	Transcript crShow: 'filter model removed:' , anAnouncement item printString , ' from model: ' , anAnouncement model printString.
+]
+
+{ #category : #transcript }
+LcsFilterExamples >> filterItemsChanged: anAnouncement [
+	Transcript crShow: 'filter model items changed:' , anAnouncement printString.
+]
+
+{ #category : #examples }
+LcsFilterExamples >> filterItemsModel [
+	<gtExample>
+	| block startedBooleanModel completedBooleanModel aModelUsingAdd classInstanceShortListModel |
+	block := [ Transcript crShow: 'model updated' ].
 	startedBooleanModel := self startedBooleanModel.
 	completedBooleanModel := self completedBooleanModel.
-
+	classInstanceShortListModel := self classInstanceShortListModel.
 	aModelUsingAdd := GtFilterItemsModel new.
-	fElement := aModelUsingAdd asFiltersElement.
-	startedBooleanModel announcer
-		when: GtFilterBooleanModelSwitchChanged
-			do: [ Transcript crShow: '''Not started'' toggled' ];
-		when: GtFilterModelLabelChanged
-			do: [ Transcript crShow: '''Not started'' toggled' ].
-	completedBooleanModel announcer
-		when: GtFilterBooleanModelSwitchChanged
-		do: [ Transcript crShow: '''Completed'' toggled' ].
-
+	gtFilterItemsElement := aModelUsingAdd asFiltersElement.
 	aModelUsingAdd announcer
 		when: GtFiltersModelUpdated
-		send: #value
-		to: block.	"do: [ Transcript crShow: 'model updated' ]."
+		send: #filterModelUpdated:
+		to: self.
 	aModelUsingAdd weak
 		when: GtFiltersModelItemAdded
-		do: [ Transcript crShow: 'model added' ].
+		send: #filterModelItemAdded:
+		to: self.
 	aModelUsingAdd weak
 		when: GtFiltersModelItemRemoved
-		do: [ Transcript crShow: 'model removed' ].
+		send: #filterItemRemoved:
+		to: self.
 	aModelUsingAdd weak
-		when: GtFiltersModelItemsChanged
-		do: [ Transcript crShow: 'model changed' ].
-
+		when: GtFiltersViewModelItemsChanged
+		send: #filterItemsChanged:
+		to: self.
 	aModelUsingAdd
 		addFilterModel: startedBooleanModel;
-		addFilterModel: completedBooleanModel.
-
+		addFilterModel: completedBooleanModel;
+		addFilterModel: classInstanceShortListModel;
+		addFilterModel: GtFilterModelExamples new toggleModelWithIcons.
 	^ aModelUsingAdd
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #transcript }
+LcsFilterExamples >> filterModelItemAdded: anAnouncement [
+	Transcript crShow: 'filter model added:' , anAnouncement item printString , ' to model: ' , anAnouncement model printString..
+]
+
+{ #category : #transcript }
+LcsFilterExamples >> filterModelUpdated: anAnouncement [
+	Transcript crShow: 'filter model updated:' , anAnouncement model printString.
+	"anAnouncement model items do: [ :each |
+		Transcript cr; tab; show: each printString ]"
+]
+
+{ #category : #examples }
+LcsFilterExamples >> filtersItemsElement [
+	<gtExample>
+	self filterItemsModel.
+	^ self gtFilterItemsElement
+]
+
+{ #category : #examples }
+LcsFilterExamples >> filtersItemsElement_FiltersViewModel [
+	<gtExample>
+	self filterItemsModel.
+	^ self gtFilterItemsElement filtersViewModel
+]
+
+{ #category : #examples }
+LcsFilterExamples >> filtersItemsElement_FiltersViewModel_FilterItemsModel [
+	<gtExample>
+	self filterItemsModel.
+	^ self gtFilterItemsElement filtersViewModel filtersModel
+]
+
+{ #category : #examples }
+LcsFilterExamples >> filtersItemsElement_FiltersViewModel_FilterViewModels [
+	<gtExample>
+	self filterItemsModel.
+	^ self gtFilterItemsElement filtersViewModel  instVarNamed: 'filterViewModels'
+]
+
+{ #category : #accessing }
+LcsFilterExamples >> gtFilterItemsElement [
+	^ gtFilterItemsElement
+]
+
+{ #category : #accessing }
+LcsFilterExamples >> gtFilterItemsElement: anObject [
+	gtFilterItemsElement := anObject
+]
+
+{ #category : #private }
+LcsFilterExamples >> instanceAndClassItems [
+	^ {'instance'.
+		'class'}
+]
+
+{ #category : #transcript }
+LcsFilterExamples >> onFeedbackUpdate [
+	Transcript crShow: 'Hello'
+]
+
+{ #category : #examples }
 LcsFilterExamples >> startedBooleanModel [
 	<gtExample>
 	^ self booleanFilterLabel: 'Started' value: true.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #examples }
 LcsFilterExamples >> subscriptionExample [
 	<gtExample>
 	| startedBooleanModel |
@@ -102,4 +200,24 @@ LcsFilterExamples >> subscriptionExample [
 		to: [ Transcript crShow: startedBooleanModel switchedOn asString ].
 
 	^ startedBooleanModel
+]
+
+{ #category : #accessing }
+LcsFilterExamples >> subscriptionRegistry [
+	^ subscriptionRegistry
+]
+
+{ #category : #accessing }
+LcsFilterExamples >> subscriptionRegistry: anObject [
+	subscriptionRegistry := anObject
+]
+
+{ #category : #accessing }
+LcsFilterExamples >> subscriptions [
+	^ subscriptions
+]
+
+{ #category : #accessing }
+LcsFilterExamples >> subscriptions: anObject [
+	subscriptions := anObject
 ]
