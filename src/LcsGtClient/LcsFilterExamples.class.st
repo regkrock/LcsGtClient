@@ -89,12 +89,16 @@ LcsFilterExamples >> filterItemsChanged: anAnouncement [
 
 { #category : #examples }
 LcsFilterExamples >> filterItemsModel [
+	" self new filterItemsModel "
+
 	<gtExample>
-	| block startedBooleanModel completedBooleanModel aModelUsingAdd classInstanceShortListModel |
+	| block startedBooleanModel completedBooleanModel aModelUsingAdd classInstanceShortListModel slotKindFilter slotClassFilter |
 	block := [ Transcript crShow: 'model updated' ].
 	startedBooleanModel := self startedBooleanModel.
 	completedBooleanModel := self completedBooleanModel.
 	classInstanceShortListModel := self classInstanceShortListModel.
+	slotKindFilter := self slotKindFilter.
+	slotClassFilter := self slotClassFilter.
 	aModelUsingAdd := GtFilterItemsModel new.
 	gtFilterItemsElement := aModelUsingAdd asFiltersElement.
 	aModelUsingAdd announcer
@@ -117,7 +121,9 @@ LcsFilterExamples >> filterItemsModel [
 		addFilterModel: startedBooleanModel;
 		addFilterModel: completedBooleanModel;
 		addFilterModel: classInstanceShortListModel;
-		addFilterModel: GtFilterModelExamples new toggleModelWithIcons.
+		addFilterModel: GtFilterModelExamples new toggleModelWithIcons;
+		addFilterModel: slotKindFilter;
+		addFilterModel: slotClassFilter.
 	^ aModelUsingAdd
 ]
 
@@ -180,6 +186,65 @@ LcsFilterExamples >> instanceAndClassItems [
 { #category : #transcript }
 LcsFilterExamples >> onFeedbackUpdate [
 	Transcript crShow: 'Hello'
+]
+
+{ #category : #examples }
+LcsFilterExamples >> slotClassFilter [
+	<gtExample>
+	<return: #GtFilterShortListModel>
+	
+	self currentFilterModel: (
+		GtFilterTextModel new
+			creator: [ :value | GtSearchMethodsWithClassPatternFilter new pattern: value ];
+			named: 'Slot Class';
+			order: 14;
+			completion: [ GtStringsCompletionStrategy new
+					completions: [ LcsBaseSlot classNamesPrefixTree ] ]).
+	self assert: self subscriptions isEmpty.
+	"self
+		assert: self currentFilterModel itemsFuture wait
+		equals: (self instanceAndClassItems collect: #asFilterModelItem).
+	self assert: self currentFilterModel selectedItem equals: 'class' asFilterModelItem."
+
+	self currentFilterModel asFilterLabeledElement.
+
+	self subscriptions.
+	self currentFilterModel weak
+		when: GtFiltersModelItemsChanged
+		do: [ Transcript crShow: 'class/instance selection changed1' ].
+
+	^ self currentFilterModel
+]
+
+{ #category : #examples }
+LcsFilterExamples >> slotKindFilter [
+	<gtExample>
+	<return: #GtFilterShortListModel>
+	
+	self currentFilterModel: (
+		GtFilterShortListModel new
+			name: 'Kind';
+			items: {'all'.
+					'accessor'.
+					'virtual'.
+					'facade'};
+			selectedItem: 'all';
+			order: 13;
+			yourself).
+	self assert: self subscriptions isEmpty.
+	"self
+		assert: self currentFilterModel itemsFuture wait
+		equals: (self instanceAndClassItems collect: #asFilterModelItem).
+	self assert: self currentFilterModel selectedItem equals: 'class' asFilterModelItem."
+
+	self currentFilterModel asFilterLabeledElement.
+
+	self subscriptions.
+	self currentFilterModel weak
+		when: GtFiltersModelItemsChanged
+		do: [ Transcript crShow: 'class/instance selection changed1' ].
+
+	^ self currentFilterModel
 ]
 
 { #category : #examples }
