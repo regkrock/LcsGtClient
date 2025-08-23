@@ -7,6 +7,20 @@ Class {
 	#category : #'LcsGtClient-! Views'
 }
 
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> _superclassesFilter: baseClass [
+	^ GtFilterShortListModel new
+		creator: [ :anItem | 
+			anItem
+				ifSome: [ :anUpToClass | self classesForm: baseClass to: anUpToClass ]
+				ifNone: [ baseClass asOrderedCollection ] ];
+		items: [ self classesForm: baseClass to: LcsBaseDomainObject ];
+		"selectedItem: baseClass;"
+		displayAllItems;
+		name: 'Slots up to';
+		order: 16
+]
+
 { #category : #'api - converting' }
 LcsGtPhlowColumnedListView >> asElementDo: aBlock [
 	"it evaluates aBlock if the view should have content"
@@ -15,17 +29,19 @@ LcsGtPhlowColumnedListView >> asElementDo: aBlock [
 	
 	aBrList := self columnedListClass new.
 	
-	filterItemsModel := GtFilterItemsModel new.
-	filtersItemsElement := filterItemsModel asFiltersElement.
-	filterItemsModel
+	self filterItemsModel: GtFilterItemsModel new.
+	filtersItemsElement := self filterItemsModel asFiltersElement.
+	self filterItemsModel
 		when: GtFiltersModelUpdated
 		do: [ 
-			aBrList itemsProvider: (self itemsProviderOnExceptionErrorElement:[ :anElement | ^ aBlock value: anElement ]).
-			aBrList invalidate ].
-	filterItemsModel addFilterModel: self slotKindFilter.
-	filterItemsModel addFilterModel: self slotClassFilter.
-	filterItemsModel addFilterModel: self domainClassFilter.
-	"filterItemsModel addFilterModel: self superclassesFilter."
+			aBrList itemsProvider: (self itemsProviderOnExceptionErrorElement:[ :anElement |  ^ aBlock value: anElement ]).
+			"aBrList invalidate" ]. 
+	self filterItemsModel addFilterModel: self domainClassFilter.
+	self filterItemsModel addFilterModel: self slotClassFilter.
+	self filterItemsModel addFilterModel: self superclassesFilter.
+	self filterItemsModel addFilterModel: self slotKindFilter.
+	self assert: self filterItemsModel items size equals: 4.
+
 
 	anItemsProvider := self itemsProviderOnExceptionErrorElement: [ :anElement | ^ aBlock value: anElement ].
 
@@ -36,6 +52,9 @@ LcsGtPhlowColumnedListView >> asElementDo: aBlock [
 	
 	aContainer addChildren: {filtersItemsElement. aHeader. aBrList}.
 
+	"Trying to set this when creating the filter causes walkbacks. This is the place to do it."
+	(self filterItemLabelled: 'Slots up to') selectedItem: self baseClass.
+	
 	horizontalScrollingEnabled
 		ifTrue: [ | aScrollableElement |
 			aContainer constraintsDo: [ :c | c horizontal fitContent ].
@@ -64,6 +83,13 @@ LcsGtPhlowColumnedListView >> asElementDo: aBlock [
 	^ aBlock value: aContainer
 ]
 
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> baseClass [
+	^ self buildContext object class = LcsSlotModel
+		ifTrue: [ self buildContext object domainClass ]
+		ifFalse: [ self buildContext object ]
+]
+
 { #category : #'api - converting' }
 LcsGtPhlowColumnedListView >> buildContainerWithList: aBrList itemsProvider: anItemsProvider [
 	| aContainer |
@@ -87,9 +113,14 @@ LcsGtPhlowColumnedListView >> buildContainerWithList: aBrList itemsProvider: anI
 ]
 
 { #category : #filters }
+LcsGtPhlowColumnedListView >> classesForm: baseClass to: anUpToClass [ 
+	^ (ReadStream on: baseClass withAllSuperclasses) upTo: anUpToClass superclass
+]
+
+{ #category : #filters }
 LcsGtPhlowColumnedListView >> domainClassFilter [
 	^ GtFilterTextModel new
-		creator: [ :value | value asSymbol ];
+		creator: [ :value | value ];
 		named: 'Class';
 		order: 15;
 		completion: [ GtStringsCompletionStrategy new
@@ -120,11 +151,26 @@ LcsGtPhlowColumnedListView >> filter: filteredItems bySelectedSlotClass: aValue 
 	^ filteredItems select: [ :each | each class name = aValue ]
 ]
 
+{ #category : #'as yet unclassified' }
+LcsGtPhlowColumnedListView >> filterItemLabelled: aString [
+	^ self filterItemsModel items
+		detect: [ :each | each label = aString ]
+		ifNone: [ nil ]
+]
+
+{ #category : #accessing }
+LcsGtPhlowColumnedListView >> filterItemsModel [
+	^ filterItemsModel
+]
+
+{ #category : #accessing }
+LcsGtPhlowColumnedListView >> filterItemsModel: anObject [
+	filterItemsModel := anObject
+]
+
 { #category : #filtering }
 LcsGtPhlowColumnedListView >> filteredItems [
 	| filteredItems |
-	"Transcript crShow: 'FilteredItems: '.
-		filterItemsModel items do: [ :each | Transcript cr; tab; show: each  printString]."
 	filteredItems := itemsProviderComputation value.
 	filteredItems := self filter: filteredItems byKind: (self valueOfFilterNamed: 'Kind').
 	filteredItems := self filter: filteredItems bySelectedSlotClass: (self valueOfFilterNamed: 'Slot Class').
@@ -144,7 +190,7 @@ LcsGtPhlowColumnedListView >> itemsProviderOnExceptionErrorElement: aBlock [
 { #category : #filters }
 LcsGtPhlowColumnedListView >> slotClassFilter [
 	^ GtFilterTextModel new
-		creator: [ :value | value asSymbol ];
+		creator: [ :value | value ];
 		named: 'Slot Class';
 		order: 14;
 		completion: [ GtStringsCompletionStrategy new
@@ -169,26 +215,12 @@ LcsGtPhlowColumnedListView >> slotKindFilter [
 LcsGtPhlowColumnedListView >> superclassesFilter [
 	<gtExample>
 	<return: #GtFilterShortListModel>
-	| aCurrentClass |
-	aCurrentClass := (self buildContext object class = LcsSlotModel)
-						ifTrue: [ self buildContext object domainClass ] 
-						ifFalse: [ self buildContext object ].
-	^ GtFilterShortListModel new
-		creator: [ :anItem | 
-			anItem
-				ifSome: [ :anUpToClass | (ReadStream on: aCurrentClass withAllSuperclasses) upTo: anUpToClass ]
-				ifNone: [ aCurrentClass asOrderedCollection ] ];
-		items: [ ((ReadStream on: aCurrentClass withAllSuperclasses) upTo: LcsObject)  ];
-		selectedItem: aCurrentClass;
-		displayAllItems;
-		name: 'Slots up to';
-		order: 16
+	| baseClass |
+	baseClass := self baseClass.
+	^ self _superclassesFilter: baseClass
 ]
 
 { #category : #filtering }
 LcsGtPhlowColumnedListView >> valueOfFilterNamed: aString [
-	^ (filterItemsModel items
-		detect: [ :each | each label = aString ]
-		ifNone: [ ^ nil ] ) 
-			asSearchFilter
+	^ (self filterItemLabelled: aString) asSearchFilter
 ]
