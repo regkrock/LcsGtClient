@@ -15,9 +15,8 @@ LcsGtPhlowColumnedListView >> _superclassesFilter: baseClass [
 				ifSome: [ :anUpToClass | self classesForm: baseClass to: anUpToClass ]
 				ifNone: [ baseClass asOrderedCollection ] ];
 		items: [ self classesForm: baseClass to: LcsBaseDomainObject ];
-		"selectedItem: baseClass;"
 		displayAllItems;
-		name: 'Slots up to';
+		name: self superclassesFilterName;
 		order: 16
 ]
 
@@ -36,10 +35,10 @@ LcsGtPhlowColumnedListView >> asElementDo: aBlock [
 		do: [ 
 			aBrList itemsProvider: (self itemsProviderOnExceptionErrorElement:[ :anElement |  ^ aBlock value: anElement ]).
 			"aBrList invalidate" ]. 
-	self filterItemsModel addFilterModel: self domainClassFilter.
-	self filterItemsModel addFilterModel: self slotClassFilter.
-	self filterItemsModel addFilterModel: self superclassesFilter.
-	self filterItemsModel addFilterModel: self slotKindFilter.
+	self filterItemsModel addFilterModel: self newSlotKindFilter.
+	self filterItemsModel addFilterModel: self newSuperclassesFilter.
+	self filterItemsModel addFilterModel: self newSlotClassFilter.
+	self filterItemsModel addFilterModel: self newDomainClassFilter.
 	self assert: self filterItemsModel items size equals: 4.
 
 
@@ -119,12 +118,22 @@ LcsGtPhlowColumnedListView >> classesForm: baseClass to: anUpToClass [
 
 { #category : #filters }
 LcsGtPhlowColumnedListView >> domainClassFilter [
-	^ GtFilterTextModel new
-		creator: [ :value | value ];
-		named: 'Class';
-		order: 15;
-		completion: [ GtStringsCompletionStrategy new
-				completions: [ LcsDomainObject classNamesPrefixTree ] ]
+	^ self filterItemLabelled: self domainClassFilterName
+]
+
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> domainClassFilterItemLabel [
+	^ self domainClassFilter selectedValue
+]
+
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> domainClassFilterName [
+	^ 'Class'
+]
+
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> domainClassFilterValue [
+	^ self valueOfFilterNamed: self domainClassFilterName
 ]
 
 { #category : #filtering }
@@ -140,15 +149,15 @@ LcsGtPhlowColumnedListView >> filter: filteredItems bySelectedDomainClass: aClas
 ]
 
 { #category : #filtering }
-LcsGtPhlowColumnedListView >> filter: filteredItems bySelectedDomainClasses: aCollectionOfClasses [
-	aCollectionOfClasses isEmptyOrNil ifTrue: [ ^ filteredItems ].
-	^ filteredItems select: [ :each | (aCollectionOfClasses includes: each domainClass name) ]
+LcsGtPhlowColumnedListView >> filter: filteredItems bySelectedSlotClass: aValue [
+	aValue isEmptyOrNil ifTrue: [ ^ filteredItems ].
+	^ filteredItems select: [ :each | each slotClass name asString = aValue ]
 ]
 
 { #category : #filtering }
-LcsGtPhlowColumnedListView >> filter: filteredItems bySelectedSlotClass: aValue [
-	aValue isEmptyOrNil ifTrue: [ ^ filteredItems ].
-	^ filteredItems select: [ :each | each class name = aValue ]
+LcsGtPhlowColumnedListView >> filter: filteredItems bySelectedSuperclasses: aCollectionOfClasses [
+	aCollectionOfClasses isEmptyOrNil ifTrue: [ ^ filteredItems ].
+	^ filteredItems select: [ :each | (aCollectionOfClasses includes: each domainClass) ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -170,12 +179,20 @@ LcsGtPhlowColumnedListView >> filterItemsModel: anObject [
 
 { #category : #filtering }
 LcsGtPhlowColumnedListView >> filteredItems [
-	| filteredItems |
-	filteredItems := itemsProviderComputation value.
-	filteredItems := self filter: filteredItems byKind: (self valueOfFilterNamed: 'Kind').
-	filteredItems := self filter: filteredItems bySelectedSlotClass: (self valueOfFilterNamed: 'Slot Class').
-	filteredItems := self filter: filteredItems bySelectedDomainClass: (self valueOfFilterNamed: 'Class').
-	"filteredItems := self filter: filteredItems bySelectedDomainClasses: (self valueOfFilterNamed: 'Slots up to')."
+	| filteredItems unfilteredItems |
+	unfilteredItems := self unfilteredItems.
+	filteredItems :=  self
+			filter: unfilteredItems
+			bySelectedSuperclasses: self superclassesFilterValue.
+	filteredItems := self
+			filter: filteredItems
+			byKind: (self valueOfFilterNamed: self slotKindFilterName).
+	filteredItems := self
+			filter: filteredItems
+			bySelectedSlotClass: self slotClassFilterValue.
+	filteredItems := self
+			filter: filteredItems
+			bySelectedDomainClass: self domainClassFilterValue.
 	^ filteredItems
 ]
 
@@ -188,19 +205,29 @@ LcsGtPhlowColumnedListView >> itemsProviderOnExceptionErrorElement: aBlock [
 ]
 
 { #category : #filters }
-LcsGtPhlowColumnedListView >> slotClassFilter [
+LcsGtPhlowColumnedListView >> newDomainClassFilter [
 	^ GtFilterTextModel new
 		creator: [ :value | value ];
-		named: 'Slot Class';
+		named: self domainClassFilterName;
+		order: 15;
+		completion: [ GtStringsCompletionStrategy new
+				completions: [ LcsDomainObject classNamesPrefixTree ] ]
+]
+
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> newSlotClassFilter [
+	^ GtFilterTextModel new
+		creator: [ :value | value ];
+		named: self slotClassFilterName;
 		order: 14;
 		completion: [ GtStringsCompletionStrategy new
 				completions: [ LcsBaseSlot classNamesPrefixTree ] ]
 ]
 
 { #category : #filters }
-LcsGtPhlowColumnedListView >> slotKindFilter [
+LcsGtPhlowColumnedListView >> newSlotKindFilter [
 	^ GtFilterShortListModel new
-		name: 'Kind';
+		name: self slotKindFilterName;
 		creator: [ :selectedValue | selectedValue itemValue = 'all' ifTrue: [nil] ifFalse: [selectedValue itemValue ] ];
 		items: {'all'.
 				'accessor'.
@@ -212,15 +239,79 @@ LcsGtPhlowColumnedListView >> slotKindFilter [
 ]
 
 { #category : #filters }
-LcsGtPhlowColumnedListView >> superclassesFilter [
-	<gtExample>
+LcsGtPhlowColumnedListView >> newSuperclassesFilter [
 	<return: #GtFilterShortListModel>
 	| baseClass |
 	baseClass := self baseClass.
 	^ self _superclassesFilter: baseClass
 ]
 
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> slotClassFilter [
+	^ self filterItemLabelled: self slotClassFilterName
+]
+
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> slotClassFilterItemLabel [
+	^ self slotClassFilter selectedValue
+]
+
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> slotClassFilterName [
+	^ 'Slot Class'
+]
+
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> slotClassFilterValue [
+	^ self valueOfFilterNamed: self slotClassFilterName
+]
+
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> slotKindFilter [
+	^ self filterItemLabelled: self slotKindFilterName
+]
+
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> slotKindFilterItemLabel [
+	^ self slotKindFilter selectedItem itemValue
+]
+
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> slotKindFilterName [
+	^ 'Kind'
+]
+
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> slotKindFilterValue [
+	^ self valueOfFilterNamed: self slotKindFilterName
+]
+
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> superclassesFilter [
+	^ self filterItemLabelled: self superclassesFilterName
+]
+
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> superclassesFilterItemLabel [
+	^ self superclassesFilter selectedItem itemValue
+]
+
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> superclassesFilterName [
+	^ 'Slots up to'
+]
+
+{ #category : #filters }
+LcsGtPhlowColumnedListView >> superclassesFilterValue [
+	^ self valueOfFilterNamed: self superclassesFilterName
+]
+
+{ #category : #filtering }
+LcsGtPhlowColumnedListView >> unfilteredItems [
+	^ itemsProviderComputation value
+]
+
 { #category : #filtering }
 LcsGtPhlowColumnedListView >> valueOfFilterNamed: aString [
-	^ (self filterItemLabelled: aString) asSearchFilter
+	^ ((self filterItemLabelled: aString) ifNil: [ ^nil ]) asSearchFilter
 ]
