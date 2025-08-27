@@ -84,9 +84,12 @@ LcsGtPhlowColumnedListView >> asElementDo: aBlock [
 
 { #category : #filters }
 LcsGtPhlowColumnedListView >> baseClass [
-	^ self buildContext object class = LcsSlotModel
+	| contextObject contextClass |
+	contextObject := self buildContext object.
+	contextClass := contextObject isClass ifTrue: [ contextObject ] ifFalse: [ contextObject class ].
+	^ contextClass = LcsSlotModel
 		ifTrue: [ self buildContext object domainClass ]
-		ifFalse: [ self buildContext object ]
+		ifFalse: [ contextClass ]
 ]
 
 { #category : #'api - converting' }
