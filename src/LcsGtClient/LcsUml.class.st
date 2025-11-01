@@ -6,6 +6,7 @@ Class {
 
 { #category : #'as yet unclassified' }
 LcsUml >> applicationEnvironmentClassHierarchyDiagram [
+	<gtExample>
 	| classes |
 	classes := LcsApplicationEnvironment withAllSuperclasses.
 	classes addAll: LcsReadOnlyUnitOfWork withAllSuperclasses.
@@ -59,7 +60,7 @@ LcsUml >> applicationEnvironmentInstanceDiagram [
 ]
 
 { #category : #'as yet unclassified' }
-LcsUml >> associationArrowStencilWithLabel: labelText [ 
+LcsUml >> associationArrowStencilWithLabel: aLabelText [ 
 	^ [ :class | 
 		| line |
 		line := BlParabollaArcElement new
@@ -67,11 +68,11 @@ LcsUml >> associationArrowStencilWithLabel: labelText [
 			curvatureFraction: 0.2;
 			border: (BlBorder paint: self associationColor).
 
-		labelText notNil
+		aLabelText notNil
 			ifTrue: [ line
 				clipChildren: false;
 				addChild: (BrLabel new
-						text: labelText;
+						text: aLabelText;
 						zIndex: 0;
 						background: Color white;
 						aptitude: (BrGlamorousLabelAptitude new fontSize: self labelFontSize);
@@ -116,25 +117,24 @@ LcsUml >> labelFontSize [
 ]
 
 { #category : #'as yet unclassified' }
-LcsUml >> proposedUmlHeirarchyModelFor: umlModelClasses [
-	"<example>"
+LcsUml >> proposedUmlHeirarchyModelFor: aUmlModel [
 	| m |
 	m := GtMondrian new.
 	m nodes
-		stencil: [ :c | 
+		stencil: [ :eachClassModel | 
 			BrLabel new
-				border: (BlBorder paint: c borderColor);
-				text: c classnameText;
+				border: (BlBorder paint: eachClassModel borderColor);
+				text: eachClassModel classnameText;
 				aptitude: BrGlamorousLabelAptitude new
 						+ (BrStyleCommonAptitude new
 								hovered: [ :aStyle | aStyle background: (Color blue alpha: 0.5) ]);
 				when: BlClickEvent
 					do: [ :e | 
-						c isClass
-							ifTrue: [ e target phlow spawnTool: (GtClassCoderTool forClass: c realClass).
+						eachClassModel isClass
+							ifTrue: [ e target phlow spawnTool: (GtClassCoderTool forClass: eachClassModel realClass).
 								e consumed: true ] ];
 				padding: (BlInsets all: 5) ];
-		with: umlModelClasses.
+		with: aUmlModel.
 	m edges
 		stencil: [ :c | 
 			BlLineElement new
@@ -142,24 +142,24 @@ LcsUml >> proposedUmlHeirarchyModelFor: umlModelClasses [
 				fromHead: (BlArrowheadTriangle new
 						scale: 4;
 						border: (BlBorder paint: c borderColor)) ];
-		connectFrom: [ :each | each modelSuperclass ].
+		connectFrom: [ :eachClassModel | eachClassModel modelSuperclass ].
 	m layout tree levelDistance: 20.
 	^ m
 ]
 
 { #category : #'as yet unclassified' }
-LcsUml >> proposedUmlModelFor: classesModel [
-	| m |
-	m := self proposedUmlHeirarchyModelFor: classesModel.
+LcsUml >> proposedUmlModelFor: aUmlModel [
+	| mondrinaModel |
+	mondrinaModel := self proposedUmlHeirarchyModelFor: aUmlModel.
 	
-	classesModel do: [ :eachClassModel |
+	aUmlModel do: [ :eachClassModel |
 		eachClassModel associations do: [ :eachAssociation |
-			m edges
+			mondrinaModel edges
 				stencil: (self associationArrowStencilWithLabel: eachAssociation associationName);
 				connectFrom: [ :each | eachClassModel ] 
 						to: [ :each | eachAssociation toClassModel ] ] ].
 							
-	^ m
+	^ mondrinaModel	
 
 ]
 
