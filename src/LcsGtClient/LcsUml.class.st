@@ -158,7 +158,14 @@ LcsUml >> proposedUmlModelFor: aUmlModel [
 				stencil: (self associationArrowStencilWithLabel: eachAssociation associationName);
 				connectFrom: [ :each | eachClassModel ] 
 						to: [ :each | eachAssociation toClassModel ] ] ].
-							
+	
+	aUmlModel positions isEmptyOrNil ifFalse: [
+		mondrinaModel root children withIndexDo: [ :child :n | child relocate: (aUmlModel positions at: n) ]].
+	
+	(aUmlModel positions notNil and: [ aUmlModel positions isNotEmpty ]) ifTrue: [
+		mondrinaModel layout custom: BlBasicLayout new.
+		mondrinaModel root children withIndexDo: [ :child :n | child relocate: (aUmlModel positions at: n) ] ].
+	
 	^ mondrinaModel	
 
 ]
