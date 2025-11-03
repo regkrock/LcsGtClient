@@ -143,30 +143,25 @@ LcsUml >> proposedUmlHeirarchyModelFor: aUmlModel [
 						scale: 4;
 						border: (BlBorder paint: c borderColor)) ];
 		connectFrom: [ :eachClassModel | eachClassModel modelSuperclass ].
-	m layout tree levelDistance: 20.
 	^ m
 ]
 
 { #category : #'as yet unclassified' }
 LcsUml >> proposedUmlModelFor: aUmlModel [
-	| mondrinaModel |
-	mondrinaModel := self proposedUmlHeirarchyModelFor: aUmlModel.
+	| mondrianModel |
+	mondrianModel := self proposedUmlHeirarchyModelFor: aUmlModel.
 	
 	aUmlModel do: [ :eachClassModel |
 		eachClassModel associations do: [ :eachAssociation |
-			mondrinaModel edges
+			mondrianModel edges
 				stencil: (self associationArrowStencilWithLabel: eachAssociation associationName);
 				connectFrom: [ :each | eachClassModel ] 
 						to: [ :each | eachAssociation toClassModel ] ] ].
+
 	
-	aUmlModel positions isEmptyOrNil ifFalse: [
-		mondrinaModel root children withIndexDo: [ :child :n | child relocate: (aUmlModel positions at: n) ]].
+	aUmlModel applyLayoutTo: mondrianModel.
 	
-	(aUmlModel positions notNil and: [ aUmlModel positions isNotEmpty ]) ifTrue: [
-		mondrinaModel layout custom: BlBasicLayout new.
-		mondrinaModel root children withIndexDo: [ :child :n | child relocate: (aUmlModel positions at: n) ] ].
-	
-	^ mondrinaModel	
+	^ mondrianModel	
 
 ]
 
