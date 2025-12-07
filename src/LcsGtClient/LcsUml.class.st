@@ -1,10 +1,12 @@
 Class {
-	#name : #LcsUml,
-	#superclass : #Object,
-	#category : #'LcsGtClient-Core'
+	#name : 'LcsUml',
+	#superclass : 'Object',
+	#category : 'LcsGtClient-Core',
+	#package : 'LcsGtClient',
+	#tag : 'Core'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 LcsUml >> applicationEnvironmentClassHierarchyDiagram [
 	<gtExample>
 	| classes |
@@ -22,7 +24,7 @@ LcsUml >> applicationEnvironmentClassHierarchyDiagram [
 		 	yourself)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 LcsUml >> applicationEnvironmentInstanceDiagram [
 	<gtExample>
 	| positions associations classes m |
@@ -59,7 +61,7 @@ LcsUml >> applicationEnvironmentInstanceDiagram [
 	^ m
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 LcsUml >> associationArrowStencilWithLabel: aLabelText [ 
 	^ [ :class | 
 		| line |
@@ -89,12 +91,12 @@ LcsUml >> associationArrowStencilWithLabel: aLabelText [
 		line ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 LcsUml >> associationColor [
 	^ Color orange alpha: 0.4
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 LcsUml >> exampleProposedClassesModel [
 	<gtExample>
 	| model |
@@ -111,12 +113,12 @@ LcsUml >> exampleProposedClassesModel [
 	^ model
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 LcsUml >> labelFontSize [
 	^ 12
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 LcsUml >> proposedUmlHeirarchyModelFor: aUmlModel [
 	| m |
 	m := GtMondrian new.
@@ -146,7 +148,7 @@ LcsUml >> proposedUmlHeirarchyModelFor: aUmlModel [
 	^ m
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 LcsUml >> proposedUmlModelFor: aUmlModel [
 	| mondrianModel |
 	mondrianModel := self proposedUmlHeirarchyModelFor: aUmlModel.
@@ -165,7 +167,7 @@ LcsUml >> proposedUmlModelFor: aUmlModel [
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 LcsUml >> umlForExistingAndProposedClasses [
 	<gtExample>
 	| classesModel |
@@ -174,7 +176,7 @@ LcsUml >> umlForExistingAndProposedClasses [
 	^ self proposedUmlModelFor: classesModel
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 LcsUml >> umlForExistingAndProposedClassesWithAssociations [
 	<gtExample>
 	| classesModel classModel |

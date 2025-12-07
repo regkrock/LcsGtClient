@@ -1,1 +1,1 @@
-Package { #name : #LcsGtClient }
+Package { #name : 'LcsGtClient' }

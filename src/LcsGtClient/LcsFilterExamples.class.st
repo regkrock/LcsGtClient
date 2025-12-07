@@ -1,16 +1,18 @@
 Class {
-	#name : #LcsFilterExamples,
-	#superclass : #Object,
+	#name : 'LcsFilterExamples',
+	#superclass : 'Object',
 	#instVars : [
 		'subscriptionRegistry',
 		'subscriptions',
 		'gtFilterItemsElement',
 		'currentFilterModel'
 	],
-	#category : #'LcsGtClient-Examples'
+	#category : 'LcsGtClient-Examples',
+	#package : 'LcsGtClient',
+	#tag : 'Examples'
 }
 
-{ #category : #examples }
+{ #category : 'examples' }
 LcsFilterExamples >> booleanFilterLabel: aLabel value: anInitialValue [
 	| fElement |
 	"fElement := booleanModel asFilterLabeledElement."
@@ -33,7 +35,7 @@ LcsFilterExamples >> booleanFilterLabel: aLabel value: anInitialValue [
 	^ self currentFilterModel
 ]
 
-{ #category : #examples }
+{ #category : 'examples' }
 LcsFilterExamples >> classInstanceShortListModel [
 	<gtExample>
 	<return: #GtFilterShortListModel>
@@ -58,18 +60,18 @@ LcsFilterExamples >> classInstanceShortListModel [
 	^ self currentFilterModel
 ]
 
-{ #category : #examples }
+{ #category : 'examples' }
 LcsFilterExamples >> completedBooleanModel [
 	<gtExample>
 	^ self booleanFilterLabel: 'Completed' value: true.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsFilterExamples >> currentFilterModel [
 	^ currentFilterModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsFilterExamples >> currentFilterModel: anObject [
 	currentFilterModel := anObject.
 	self subscriptionRegistry: self currentFilterModel announcer subscriptions.
@@ -77,17 +79,17 @@ LcsFilterExamples >> currentFilterModel: anObject [
 
 ]
 
-{ #category : #transcript }
+{ #category : 'transcript' }
 LcsFilterExamples >> filterItemRemoved: anAnouncement [
 	Transcript crShow: 'filter model removed:' , anAnouncement item printString , ' from model: ' , anAnouncement model printString.
 ]
 
-{ #category : #transcript }
+{ #category : 'transcript' }
 LcsFilterExamples >> filterItemsChanged: anAnouncement [
 	Transcript crShow: 'filter model items changed:' , anAnouncement printString.
 ]
 
-{ #category : #examples }
+{ #category : 'examples' }
 LcsFilterExamples >> filterItemsModel [
 	" self new filterItemsModel "
 
@@ -127,68 +129,68 @@ LcsFilterExamples >> filterItemsModel [
 	^ aModelUsingAdd
 ]
 
-{ #category : #transcript }
+{ #category : 'transcript' }
 LcsFilterExamples >> filterModelItemAdded: anAnouncement [
 	Transcript crShow: 'filter model added:' , anAnouncement item printString , ' to model: ' , anAnouncement model printString..
 ]
 
-{ #category : #transcript }
+{ #category : 'transcript' }
 LcsFilterExamples >> filterModelUpdated: anAnouncement [
 	Transcript crShow: 'filter model updated:' , anAnouncement model printString.
 	"anAnouncement model items do: [ :each |
 		Transcript cr; tab; show: each printString ]"
 ]
 
-{ #category : #examples }
+{ #category : 'examples' }
 LcsFilterExamples >> filtersItemsElement [
 	<gtExample>
 	self filterItemsModel.
 	^ self gtFilterItemsElement
 ]
 
-{ #category : #examples }
+{ #category : 'examples' }
 LcsFilterExamples >> filtersItemsElement_FiltersViewModel [
 	<gtExample>
 	self filterItemsModel.
 	^ self gtFilterItemsElement filtersViewModel
 ]
 
-{ #category : #examples }
+{ #category : 'examples' }
 LcsFilterExamples >> filtersItemsElement_FiltersViewModel_FilterItemsModel [
 	<gtExample>
 	self filterItemsModel.
 	^ self gtFilterItemsElement filtersViewModel filtersModel
 ]
 
-{ #category : #examples }
+{ #category : 'examples' }
 LcsFilterExamples >> filtersItemsElement_FiltersViewModel_FilterViewModels [
 	<gtExample>
 	self filterItemsModel.
 	^ self gtFilterItemsElement filtersViewModel  instVarNamed: 'filterViewModels'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsFilterExamples >> gtFilterItemsElement [
 	^ gtFilterItemsElement
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsFilterExamples >> gtFilterItemsElement: anObject [
 	gtFilterItemsElement := anObject
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 LcsFilterExamples >> instanceAndClassItems [
 	^ {'instance'.
 		'class'}
 ]
 
-{ #category : #transcript }
+{ #category : 'transcript' }
 LcsFilterExamples >> onFeedbackUpdate [
 	Transcript crShow: 'Hello'
 ]
 
-{ #category : #examples }
+{ #category : 'examples' }
 LcsFilterExamples >> slotClassFilter [
 	<gtExample>
 	<return: #GtFilterShortListModel>
@@ -216,7 +218,7 @@ LcsFilterExamples >> slotClassFilter [
 	^ self currentFilterModel
 ]
 
-{ #category : #examples }
+{ #category : 'examples' }
 LcsFilterExamples >> slotKindFilter [
 	<gtExample>
 	<return: #GtFilterShortListModel>
@@ -247,13 +249,13 @@ LcsFilterExamples >> slotKindFilter [
 	^ self currentFilterModel
 ]
 
-{ #category : #examples }
+{ #category : 'examples' }
 LcsFilterExamples >> startedBooleanModel [
 	<gtExample>
 	^ self booleanFilterLabel: 'Started' value: true.
 ]
 
-{ #category : #examples }
+{ #category : 'examples' }
 LcsFilterExamples >> subscriptionExample [
 	<gtExample>
 	| startedBooleanModel |
@@ -267,22 +269,22 @@ LcsFilterExamples >> subscriptionExample [
 	^ startedBooleanModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsFilterExamples >> subscriptionRegistry [
 	^ subscriptionRegistry
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsFilterExamples >> subscriptionRegistry: anObject [
 	subscriptionRegistry := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsFilterExamples >> subscriptions [
 	^ subscriptions
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsFilterExamples >> subscriptions: anObject [
 	subscriptions := anObject
 ]

@@ -1,10 +1,12 @@
 Class {
-	#name : #LcsUmlClassDiagram,
-	#superclass : #Object,
-	#category : #'LcsGtClient-Mondrian'
+	#name : 'LcsUmlClassDiagram',
+	#superclass : 'Object',
+	#category : 'LcsGtClient-Mondrian',
+	#package : 'LcsGtClient',
+	#tag : 'Mondrian'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsUmlClassDiagram >> associationArrowStencil [
 	^ [ :c | 
 	BlParabollaArcElement new
@@ -14,7 +16,7 @@ LcsUmlClassDiagram >> associationArrowStencil [
 		toHead: (BlArrowheadSimpleArrow new border: (BlBorder paint: self associationColor)) ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsUmlClassDiagram >> associationArrowStencilWithLabel: labelText [
 	^ [ :class | 
 	| line |
@@ -44,12 +46,12 @@ LcsUmlClassDiagram >> associationArrowStencilWithLabel: labelText [
 	line ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsUmlClassDiagram >> associationColor [
 	^ Color orange alpha: 0.4
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsUmlClassDiagram >> classHierarchyFor: classes [
 	"This is a simpler visualization than the umlClasses one, with just class names.
 	From GtMondrianDomainExamples"
@@ -66,7 +68,7 @@ LcsUmlClassDiagram >> classHierarchyFor: classes [
 	^ m
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsUmlClassDiagram >> classHierarchyFor: classes withAssociations: associations [
 	"NB: When using this, you will need to fix the layout, for example,
 	by manually repositioning the nodes, saving the positions:
@@ -90,7 +92,7 @@ LcsUmlClassDiagram >> classHierarchyFor: classes withAssociations: associations 
 	^ m
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsUmlClassDiagram >> classHierarchyFor: classes withAssociations: associations andRoots: roots [
 	"See the comment for #classHierarchyFor:withAssociations: concerning positions."
 
@@ -113,7 +115,7 @@ LcsUmlClassDiagram >> classHierarchyFor: classes withAssociations: associations 
 	^ m
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsUmlClassDiagram >> classHierarchyFor: classes withAssociationsAndLabels: associationsWithLabels [
 	"Each association should look like:
 		CompiledMethod -> { 
@@ -136,7 +138,7 @@ LcsUmlClassDiagram >> classHierarchyFor: classes withAssociationsAndLabels: asso
 	^ m
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsUmlClassDiagram >> classStencil [
 	^ [ :class | 
 	BrLabel new
@@ -152,7 +154,7 @@ LcsUmlClassDiagram >> classStencil [
 		padding: (BlInsets all: 5) ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsUmlClassDiagram >> inheritanceArrowStencil [
 	^ [ :c | 
 	BlLineElement new
@@ -162,12 +164,12 @@ LcsUmlClassDiagram >> inheritanceArrowStencil [
 				border: (BlBorder paint: Color gray)) ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsUmlClassDiagram >> labelFontSize [
 	^ 12
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LcsUmlClassDiagram >> rootClassStencil [
 	"Just a small circle."
 

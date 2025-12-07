@@ -1,6 +1,6 @@
-Extension { #name : #GtPhlowProtoView }
+Extension { #name : 'GtPhlowProtoView' }
 
-{ #category : #'*LcsGtClient' }
+{ #category : '*LcsGtClient' }
 GtPhlowProtoView >> filteredColumnedList [
 	<return: #GtPhlowColumnedListView>
 	^ LcsGtPhlowColumnedListView new
