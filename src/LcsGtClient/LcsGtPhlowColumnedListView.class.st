@@ -4,9 +4,9 @@ Class {
 	#instVars : [
 		'filterItemsModel'
 	],
-	#category : 'LcsGtClient-! Views',
+	#category : 'LcsGtClient-Views',
 	#package : 'LcsGtClient',
-	#tag : '! Views'
+	#tag : 'Views'
 }
 
 { #category : 'filters' }
