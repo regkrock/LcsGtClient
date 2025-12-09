@@ -28,5 +28,6 @@ LcsGtClientUtility >> openPage: aName in: aDatabaseName [
 	page := (LeDatabase databaseNamed: aDatabaseName)
 			pageNamed: aName.
 	world := GtWorld allInstances any.
-	BlSpace spawnPage: page from: world root
+	BlTaskAction enqueueElement: world root action: [
+		BlSpace spawnPage: page from: world root ]
 ]
