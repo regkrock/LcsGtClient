@@ -114,8 +114,27 @@ LcsUml >> exampleProposedClassesModel [
 ]
 
 { #category : 'as yet unclassified' }
+LcsUml >> fromUmlModel: aUmlModel populate: mondrianModel [
+	aUmlModel do: [ :eachClassModel | 
+		self populate: mondrianModel from: eachClassModel ]
+]
+
+{ #category : 'as yet unclassified' }
 LcsUml >> labelFontSize [
 	^ 12
+]
+
+{ #category : 'as yet unclassified' }
+LcsUml >> populate: mondrianModel from: aClassModel [
+	^ aClassModel associations do: [ :eachAssociation | 
+			self populateEdgesIn: mondrianModel from: aClassModel association: eachAssociation ]
+]
+
+{ #category : 'as yet unclassified' }
+LcsUml >> populateEdgesIn: mondrianModel from: aClassModel association: anAssociation [
+	^ mondrianModel edges
+		stencil: (self associationArrowStencilWithLabel: anAssociation associationName);
+		connectFrom: [ :each | aClassModel ] to: [ :each | anAssociation toClassModel ]
 ]
 
 { #category : 'as yet unclassified' }
@@ -152,19 +171,12 @@ LcsUml >> proposedUmlHeirarchyModelFor: aUmlModel [
 LcsUml >> proposedUmlModelFor: aUmlModel [
 	| mondrianModel |
 	mondrianModel := self proposedUmlHeirarchyModelFor: aUmlModel.
-	
-	aUmlModel do: [ :eachClassModel |
-		eachClassModel associations do: [ :eachAssociation |
-			mondrianModel edges
-				stencil: (self associationArrowStencilWithLabel: eachAssociation associationName);
-				connectFrom: [ :each | eachClassModel ] 
-						to: [ :each | eachAssociation toClassModel ] ] ].
+	self fromUmlModel: aUmlModel populate: mondrianModel.
 
-	
+
 	aUmlModel applyLayoutTo: mondrianModel.
-	
-	^ mondrianModel	
 
+	^ mondrianModel
 ]
 
 { #category : 'as yet unclassified' }
