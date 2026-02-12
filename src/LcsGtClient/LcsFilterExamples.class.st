@@ -222,19 +222,18 @@ LcsFilterExamples >> slotClassFilter [
 LcsFilterExamples >> slotKindFilter [
 	<gtExample>
 	<return: #GtFilterShortListModel>
-	
-	self currentFilterModel: (
-		GtFilterShortListModel new
-			name: 'Kind';
-			items: {'all'.
-					'accessor'.
-					'virtual'.
-					'facade'};
-			selectedItem: 'all';
-			order: 13;
-			yourself).
-	self assert: self subscriptions isEmpty.
-	"self
+	self
+		currentFilterModel: (GtFilterShortListModel new
+				name: 'Kind';
+				items: {'all'.
+						'accessor'.
+						'collectionItem'.
+						'facade'.
+						'virtual'};
+				selectedItem: 'all';
+				order: 13;
+				yourself).
+	self assert: self subscriptions isEmpty.	"self
 		assert: self currentFilterModel itemsFuture wait
 		equals: (self instanceAndClassItems collect: #asFilterModelItem).
 	self assert: self currentFilterModel selectedItem equals: 'class' asFilterModelItem."
@@ -244,7 +243,8 @@ LcsFilterExamples >> slotKindFilter [
 	self subscriptions.
 	self currentFilterModel weak
 		when: GtFiltersModelItemsChanged
-		do: [ Transcript crShow: 'class/instance selection changed1' ].
+		do: [ Transcript crShow: 'class/instance selection changed1' ]
+		for: self.
 
 	^ self currentFilterModel
 ]

@@ -236,8 +236,9 @@ LcsGtPhlowColumnedListView >> newSlotKindFilter [
 		creator: [ :selectedValue | selectedValue itemValue = 'all' ifTrue: [nil] ifFalse: [selectedValue itemValue ] ];
 		items: {'all'.
 				'accessor'.
-				'virtual'.
-				'facade'};
+				'collectionItem'.
+				'facade'.
+				'virtual'};
 		selectedItem: 'all';
 		order: 13;
 		yourself
