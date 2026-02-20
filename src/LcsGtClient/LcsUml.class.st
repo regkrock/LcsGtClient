@@ -7,6 +7,64 @@ Class {
 }
 
 { #category : 'as yet unclassified' }
+LcsUml >> _associationArrowStencilWithLabel: anAssociation [
+	| line |
+	line := BlParabollaArcElement new
+			zIndex: 0;
+			curvatureFraction: anAssociation factor;
+			border: (BlBorder paint: self associationColor).
+
+	anAssociation associationName notNil
+		ifTrue: [ line
+				clipChildren: false;
+				addChild: (BrLabel new
+						text: anAssociation associationName;
+						zIndex: 0;
+						background: Color white;
+						aptitude: (BrGlamorousLabelAptitude new fontSize: self labelFontSize);
+						margin: (BlInsets top: 10);
+						constraintsDo: [ :c | 
+							c ignored vertical alignCenterAt: 0.3.
+							c ignored horizontal alignCenter.
+							c ignoreByLayout ]) ].
+
+	line := line
+			toHead: (BlArrowheadSimpleArrow new border: (BlBorder paint: self associationColor)).
+
+
+	^ line
+]
+
+{ #category : 'as yet unclassified' }
+LcsUml >> _associationArrowStencilWithLabel: anAssociationName factor: aFactor [
+	| line |
+	line := BlParabollaArcElement new
+			zIndex: 0;
+			curvatureFraction: aFactor;
+			border: (BlBorder paint: self associationColor).
+
+	anAssociationName notNil
+		ifTrue: [ line
+				clipChildren: false;
+				addChild: (BrLabel new
+						text: anAssociationName;
+						zIndex: 0;
+						background: Color white;
+						aptitude: (BrGlamorousLabelAptitude new fontSize: self labelFontSize);
+						margin: (BlInsets top: 10);
+						constraintsDo: [ :c | 
+							c ignored vertical alignCenterAt: 0.3.
+							c ignored horizontal alignCenter.
+							c ignoreByLayout ]) ].
+
+	line := line
+			toHead: (BlArrowheadSimpleArrow new border: (BlBorder paint: self associationColor)).
+
+
+	^ line
+]
+
+{ #category : 'as yet unclassified' }
 LcsUml >> applicationEnvironmentClassHierarchyDiagram [
 	<gtExample>
 	| classes |
@@ -62,33 +120,8 @@ LcsUml >> applicationEnvironmentInstanceDiagram [
 ]
 
 { #category : 'as yet unclassified' }
-LcsUml >> associationArrowStencilWithLabel: aLabelText [ 
-	^ [ :class | 
-		| line |
-		line := BlParabollaArcElement new
-			zIndex: 0;
-			curvatureFraction: 0.2;
-			border: (BlBorder paint: self associationColor).
-
-		aLabelText notNil
-			ifTrue: [ line
-				clipChildren: false;
-				addChild: (BrLabel new
-						text: aLabelText;
-						zIndex: 0;
-						background: Color white;
-						aptitude: (BrGlamorousLabelAptitude new fontSize: self labelFontSize);
-						margin: (BlInsets top: 10);
-						constraintsDo: [ :c | 
-							c ignored vertical alignCenterAt: 0.3.
-							c ignored horizontal alignCenter.
-							c ignoreByLayout ]) ].
-
-		line := line
-			toHead: (BlArrowheadSimpleArrow new border: (BlBorder paint: self associationColor)).
-
-
-		line ]
+LcsUml >> associationArrowStencilWithLabel: anAssociation [
+	^ [ :class | self _associationArrowStencilWithLabel: anAssociation ]
 ]
 
 { #category : 'as yet unclassified' }
@@ -133,7 +166,7 @@ LcsUml >> populate: mondrianModel from: aClassModel [
 { #category : 'as yet unclassified' }
 LcsUml >> populateEdgesIn: mondrianModel from: aClassModel association: anAssociation [
 	^ mondrianModel edges
-		stencil: (self associationArrowStencilWithLabel: anAssociation associationName);
+		stencil: (self associationArrowStencilWithLabel: anAssociation);
 		connectFrom: [ :each | aClassModel ] to: [ :each | anAssociation toClassModel ]
 ]
 
