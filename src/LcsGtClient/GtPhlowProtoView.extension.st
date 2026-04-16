@@ -2,7 +2,7 @@ Extension { #name : 'GtPhlowProtoView' }
 
 { #category : '*LcsGtClient' }
 GtPhlowProtoView >> lcsFilteredColumnedList [
-	<return: #GtPhlowColumnedListView>
+	<return: #LcsGtPhlowColumnedListView>
 	^ LcsGtPhlowColumnedListView new
 		originalView: self;
 		definingMethod: (GtPhlowDefiningMethodsCollector forContext: thisContext) collect
