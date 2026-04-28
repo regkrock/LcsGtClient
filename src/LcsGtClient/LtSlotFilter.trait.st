@@ -90,8 +90,10 @@ LtSlotFilter >> filterItemsModel: anObject [
 { #category : 'filtering' }
 LtSlotFilter >> filteredItems [
 	| filteredItems unfilteredItems |
-	unfilteredItems := self unfilteredItems.
-	filteredItems :=  self
+	unfilteredItems := [ self unfilteredItems ]
+			on: LcsSlotModelNotInitializedError
+			do: [ :s | s return: OrderedCollection new ].
+	filteredItems := self
 			filter: unfilteredItems
 			bySelectedSuperclasses: self superclassesFilterValue.
 	filteredItems := self
