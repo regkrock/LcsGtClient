@@ -201,7 +201,7 @@ LcsFilterExamples >> slotClassFilter [
 			named: 'Slot Class';
 			order: 14;
 			completion: [ GtStringsCompletionStrategy new
-					completions: [ LcsBaseSlot classNamesPrefixTree ] ]).
+					completions: [ LcsDomainSlot classNamesPrefixTree ] ]).
 	self assert: self subscriptions isEmpty.
 	"self
 		assert: self currentFilterModel itemsFuture wait

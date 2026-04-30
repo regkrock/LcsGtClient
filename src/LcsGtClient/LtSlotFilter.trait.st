@@ -133,7 +133,7 @@ LtSlotFilter >> newSlotClassFilter [
 		named: self slotClassFilterName;
 		order: 14;
 		completion: [ GtStringsCompletionStrategy new
-				completions: [ LcsBaseSlot classNamesPrefixTree ] ]
+				completions: [ LcsDomainSlot classNamesPrefixTree ] ]
 ]
 
 { #category : 'filters' }
